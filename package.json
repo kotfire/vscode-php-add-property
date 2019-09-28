@@ -1,0 +1,109 @@
+{
+	"name": "php-add-property",
+	"displayName": "PHP Add Property",
+	"description": "Quick way to add PHP class properties",
+	"publisher": "kotfire",
+	"license": "SEE LICENSE IN LICENSE",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.38.0"
+	},
+	"categories": [
+		"Programming Languages",
+		"Snippets"
+	],
+	"keywords": [
+		"php",
+		"autocompletion",
+		"help",
+		"constructor",
+		"property"
+	],
+	"icon": "images/icon.png",
+	"activationEvents": [
+		"onCommand:phpAddProperty.add"
+	],
+	"main": "./src/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "phpAddProperty.add",
+				"title": "Add PHP Property"
+			}
+		],
+		"configuration": {
+            "type": "object",
+            "title": "PHP Add Property",
+            "properties": {
+				"phpAddProperty.property.visibility.choose": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Specifies whether to choose property visibility when inserting"
+				},
+                "phpAddProperty.property.visibility.default": {
+                    "type": "string",
+                    "default": "private",
+                    "enum": ["public", "protected", "private"],
+                    "description": "Specifies the default property visibility"
+				},
+				"phpAddProperty.property.stopToImport": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Specifies whether to stop after typing the type to refer to an external fully qualified name with an alias or importing"
+				},
+				"phpAddProperty.property.docblock.add": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Specifies whether to add a docblock @var type to the property"
+				},
+				"phpAddProperty.property.docblock.withParameter": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Specifies whether to add the docblock @var type to the property and the constructor parameter type at the same time"
+				},
+				"phpAddProperty.property.docblock.stopToImport": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Specifies whether to stop after typing the type to refer to an external fully qualified name with an alias or importing"
+				},
+				"phpAddProperty.property.types": {
+					"type": "boolean",
+					"default": false,
+					"markdownDescription": "Specifies whether to enable PHP 7.4+ typed properties [More info](https://wiki.php.net/rfc/typed_properties_v2)"
+				},
+				"phpAddProperty.constructor.visibility.choose": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Specifies whether to choose constructor visibility when inserting"
+				},
+				"phpAddProperty.constructor.visibility.default": {
+                    "type": "string",
+                    "default": "public",
+                    "enum": ["public", "protected", "private"],
+                    "description": "Specifies the default constructor visibility"
+                }
+            }
+        }
+	},
+	"scripts": {
+		"test": "node ./test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.1.1",
+		"@types/mocha": "^5.2.6",
+		"@types/node": "^10.12.21",
+		"@types/vscode": "^1.38.0",
+		"eslint": "^5.13.0",
+		"glob": "^7.1.4",
+		"mocha": "^6.1.4",
+		"typescript": "^3.3.1",
+		"vscode-test": "^1.2.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/kotfire/vscode-php-add-property.git"
+	},
+	"bugs": {
+		"url": "https://github.com/kotfire/vscode-php-add-property/issues"
+	}
+}
