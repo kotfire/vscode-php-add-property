@@ -1,3 +1,7 @@
+[![Version](https://vsmarketplacebadge.apphb.com/version-short/kotfire.php-add-property.svg)](https://marketplace.visualstudio.com/items?itemName=kotfire.php-add-property)
+[![Rating](https://vsmarketplacebadge.apphb.com/rating-short/kotfire.php-add-property.svg)](https://marketplace.visualstudio.com/items?itemName=kotfire.php-add-property)
+[![Installs](https://vsmarketplacebadge.apphb.com/installs/kotfire.php-add-property.svg)](https://marketplace.visualstudio.com/items?itemName=kotfire.php-add-property)
+
 # PHP Add Property
 
 Visual Code Studio extension to quickly add PHP class properties
