@@ -39,3 +39,5 @@ This extension contributes the following settings:
 * `phpAddProperty.property.types`: Specifies whether to enable PHP 7.4+ typed properties [More info](https://wiki.php.net/rfc/typed_properties_v2)
 * `phpAddProperty.constructor.visibility.choose`: Specifies whether to choose constructor visibility when inserting
 * `phpAddProperty.constructor.visibility.default`: Specifies the default constructor visibility
+* `phpAddProperty.constructor.breakIntoMultilineIfLengthExceeded.enabled`: Specifies whether to break the constructor into multiple lines if the given line length is exceeded
+* `phpAddProperty.constructor.breakIntoMultilineIfLengthExceeded.maxLineLength`: Specifies the maximum line length before using a multiline constructor
