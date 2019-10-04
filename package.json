@@ -81,7 +81,17 @@
                     "default": "public",
                     "enum": ["public", "protected", "private"],
                     "description": "Specifies the default constructor visibility"
-                }
+				},
+				"phpAddProperty.constructor.breakIntoMultilineIfLengthExceeded.enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "Specifies whether to break the constructor into multiple lines if the given line length is exceeded"
+				},
+				"phpAddProperty.constructor.breakIntoMultilineIfLengthExceeded.maxLineLength": {
+					"type": "integer",
+					"default": 120,
+					"description": "Specifies the maximum line length before using a multiline constructor"
+				}
             }
         }
 	},

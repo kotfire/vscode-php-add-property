@@ -214,6 +214,10 @@ class AddProperty {
 
         constructorText = constructorText.replace(constructorLastParameterText, output);
 
+        if (!this.isMultiLineConstructor) {
+            constructorText = this.breakIntoMultiline(constructorText);
+        }
+
         text += constructorText;
         
         // Initialize property to parameter
@@ -231,6 +235,30 @@ class AddProperty {
             new vscode.SnippetString(text),
             range
         );
+    }
+
+    breakIntoMultiline(constructorText) {
+        if (this.config('phpAddProperty.constructor.breakIntoMultilineIfLengthExceeded.enabled') === true) {
+            const regex = /((public|protected|private)\s+function\s+__construct\s*\(((?:\s|\S)*)(?=\))\s*\))\s*{/;
+            const match = regex.exec(constructorText);
+            if (match) {
+                const constructorLineText = match[1];
+
+                if (constructorLineText.length > this.config('phpAddProperty.constructor.breakIntoMultilineIfLengthExceeded.maxLineLength')) {
+                    const visibilityText = match[2];
+                    const parametersText = match[3];
+                    const parameters = parametersText.split(',').map(parameter => this.indentText(parameter.trim(), 2));
+
+                    const multilineConstructorText = `${visibilityText} function __construct(\n`
+                        + `${parameters.join(',\n')}\n`
+                        + this.indentText(') {');
+
+                    constructorText = constructorText.replace(match[0], multilineConstructorText);
+                }
+            }
+        }
+
+        return constructorText;
     }
 
     indentText(text, level = 1) {
