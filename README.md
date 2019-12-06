@@ -34,6 +34,7 @@ This extension contributes the following settings:
 * `phpAddProperty.property.visibility.default`: Specifies the default property visibility
 * `phpAddProperty.property.stopToImport`: Specifies whether to stop after typing the type to refer to an external fully qualified name with an alias or importing
 * `phpAddProperty.property.docblock.add`: Specifies whether to add a docblock @var type to the property
+* `phpAddProperty.property.docblock.multiline`: Specifies whether to use a multiline docblock
 * `phpAddProperty.property.docblock.withParameter`: Specifies whether to add the docblock @var type to the property and the constructor parameter type at the same time
 * `phpAddProperty.property.docblock.stopToImport`: Specifies whether to stop after typing the type to refer to an external fully qualified name with an alias or importing
 * `phpAddProperty.property.types`: Specifies whether to enable PHP 7.4+ typed properties [More info](https://wiki.php.net/rfc/typed_properties_v2)
