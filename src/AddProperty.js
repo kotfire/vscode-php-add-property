@@ -155,10 +155,7 @@ class AddProperty {
             );
         }
 
-        this.activeEditor().insertSnippet(
-            new vscode.SnippetString(snippet),
-            range
-        );
+        this.replaceWithSnippet(snippet, range);
     }
 
     insertProperty() {
@@ -231,10 +228,7 @@ class AddProperty {
             this.constructorEndLine.range.end
         );
 
-        this.activeEditor().insertSnippet(
-            new vscode.SnippetString(text),
-            range
-        );
+        this.replaceWithSnippet(text, range);
     }
 
     breakIntoMultiline(constructorText) {
@@ -321,6 +315,29 @@ class AddProperty {
         propertyStatementText += `\\$${this.name};\n\n`;
 
         return propertyStatementText;
+    }
+
+    replaceWithSnippet(text, range) {
+        const rangeLines = range.end.line - range.start.line;
+
+        this.activeEditor().edit(
+            editBuilder => {
+                editBuilder.replace(range, "\n".repeat(rangeLines))
+            },
+            {
+                undoStopBefore: false,
+                undoStopAfter: false 
+            }
+        );
+
+        this.activeEditor().insertSnippet(
+            new vscode.SnippetString(text),
+            range,
+            {
+                undoStopBefore: false,
+                undoStopAfter: false 
+            }
+        );
     }
 
     calculateIndentationLevel(index) {
