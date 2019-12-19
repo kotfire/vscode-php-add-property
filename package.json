@@ -60,6 +60,11 @@
 					"default": false,
 					"description": "Specifies whether to add a docblock @var type to the property"
 				},
+				"phpAddProperty.property.docblock.multiline": {
+					"type": "boolean",
+					"default": false,
+					"description": "Specifies whether to use a multiline docblock"
+				},
 				"phpAddProperty.property.docblock.withParameter": {
 					"type": "boolean",
 					"default": false,

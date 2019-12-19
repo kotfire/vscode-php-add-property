@@ -303,11 +303,15 @@ class AddProperty {
             
             stopText += `$${docblockTypeStop}`;
 
-            if (this.config('phpAddProperty.property.docblock.withParameter') === false) {
-                stopText += ' ';
-            }
+            if (this.config('phpAddProperty.property.docblock.multiline') === true) {
+                propertyStatementText += `/**\n${this.indentText(' * @var ')}${stopText}\n${this.indentText(' */')}\n${this.indentText('')}`;
+            } else {
+                if (this.config('phpAddProperty.property.docblock.withParameter') === false) {
+                    stopText += ' ';
+                }
 
-            propertyStatementText += `/** @var ${stopText}*/\n${this.indentText('')}`
+                propertyStatementText += `/** @var ${stopText}*/\n${this.indentText('')}`;
+            }
         }
 
         const visibility = this.config('phpAddProperty.property.visibility.default');
