@@ -1,3 +1,8 @@
+## 0.2.0 (2019-12-19)
+
+### Added
+- Add a new option to use multiline docblocks
+
 ## 0.1.0 (2019-10-04)
 
 ### Added
