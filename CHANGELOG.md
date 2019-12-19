@@ -1,3 +1,8 @@
+## 0.2.1 (2019-12-19)
+
+### Fixed
+- [#4](https://github.com/kotfire/vscode-php-add-property/issues/4) Cursor is sometimes placed in wrong location after generating property
+
 ## 0.2.0 (2019-12-19)
 
 ### Added
