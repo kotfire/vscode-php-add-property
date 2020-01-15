@@ -30,6 +30,46 @@ class AddProperty {
         }
     }
 
+    async append() {
+        this.reset();
+        const document = this.activeEditor().document;
+
+        if (document.uri === undefined) {
+            return;
+        }
+
+        this.parseDocument(document);
+
+        if (!this.classLine) {
+            return;
+        }
+
+        const editor = this.activeEditor();
+        const line = document.lineAt(editor.selection.active.line);
+            
+        if (!line.text.includes('$')) {
+            return;
+        }
+
+        const match = /\$([^;]*)/.exec(line.text);
+
+        if (!match[1]) {
+            return;
+        }
+
+        this.name = match[1];
+
+        if (this.name === undefined || this.name.trim() === "") {
+            return;
+        }
+
+        if (! /function __construct/gm.test(this.activeEditor().document.getText())) {
+            this.insertConstructor(false);
+        } else {
+            this.insertProperty(false);
+        }
+    }
+
     insertConstructor(shouldInsertPropertyStatement = true) {
         let insertLine = this.classLine;
 

@@ -21,7 +21,8 @@
 	],
 	"icon": "images/icon.png",
 	"activationEvents": [
-		"onCommand:phpAddProperty.add"
+		"onCommand:phpAddProperty.add",
+		"onCommand:phpAddProperty.append"
 	],
 	"main": "./src/extension.js",
 	"contributes": {
@@ -29,6 +30,10 @@
 			{
 				"command": "phpAddProperty.add",
 				"title": "Add PHP Property"
+			},
+			{
+				"command": "phpAddProperty.append",
+				"title": "Add Existing PHP Property"
 			}
 		],
 		"configuration": {

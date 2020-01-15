@@ -9,6 +9,11 @@ function activate(context) {
             if (vscode.window.activeTextEditor !== undefined) {
                 addProperty.add();
             }
+        }),
+        vscode.commands.registerCommand('phpAddProperty.append', () => {
+            if (vscode.window.activeTextEditor !== undefined) {
+                addProperty.append();
+            }
         })
     );
 
