@@ -21,6 +21,7 @@
 	],
 	"icon": "images/icon.png",
 	"activationEvents": [
+		"onLanguage:php",
 		"onCommand:phpAddProperty.add",
 		"onCommand:phpAddProperty.append"
 	],
@@ -36,6 +37,22 @@
 				"title": "Add Existing PHP Property"
 			}
 		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "phpAddProperty.append",
+					"when": "editorLangId == php"
+				}
+			],
+			"editor/context": [
+				{
+					"when": "resourceLangId == php",
+					"command": "phpAddProperty.append",
+					"alt": "phpAddProperty.append",
+					"group": "0_phpAddProperty@1"
+				}
+			]
+		},
 		"configuration": {
 			"type": "object",
 			"title": "PHP Add Property",
