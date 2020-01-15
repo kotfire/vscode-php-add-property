@@ -9,76 +9,7 @@ class AddProperty {
             return;
         }
 
-        for (let lineNumber = 0; lineNumber < document.lineCount; lineNumber++) {
-            const line = document.lineAt(lineNumber);
-            const textLine = line.text;
-            
-            if (/class\s+\w+/.test(textLine)) {
-                this.classLine = line;
-                if (! /{/.test(textLine)) {
-                    for (let nextLineNumber = lineNumber + 1; nextLineNumber < document.lineCount; nextLineNumber++) {
-                        const nextLine = document.lineAt(nextLineNumber);
-                        if (/{/.test(nextLine.text)) {
-                            this.classLine = nextLine;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (this.classLine && /use\s+\w+/.test(textLine)) {
-                this.lastTraitLine = line;
-            }
-
-            if (/(public|protected|private|static)\s+\$\w+.*;/.test(textLine) || /const\s+\w+.*;/.test(textLine)) {
-                this.lastPropertyLine = line;
-            }
-
-            if (/function __construct/.test(textLine)) {
-                this.constructorStartLine = line;
-                let previousLineNumber = lineNumber - 1;
-                if (previousLineNumber > 0) {
-                    let previousLine = document.lineAt(previousLineNumber);
-                    
-                    if (/\*\//.test(previousLine.text)) {
-                        for (previousLineNumber--; previousLineNumber > 0; previousLineNumber--) {
-                            previousLine = document.lineAt(previousLineNumber);
-                            if (/\/\*\*/.test(previousLine.text)) {
-                                this.constructorStartLine = previousLine;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                for (let ln = lineNumber; ln < document.lineCount; ln++) {
-                    const l = document.lineAt(ln);
-                    const tl = l.text;
-
-                    if (/\$\w+/.test(tl)) {
-                        this.constructorLastParameterLine = l;
-                    }
-
-                    if (/\)(?!\))/.test(tl)) {
-                        this.constructorParametersCloseLine = l;
-                    }
-
-                    if (/{/.test(tl)) {
-                        this.isMultiLineConstructor = this.constructorParametersCloseLine.lineNumber !== lineNumber;
-                        break;
-                    }
-                }
-                
-
-                for (let nextLineNumber = lineNumber + 1; nextLineNumber < document.lineCount; nextLineNumber++) {
-                    const nextLine = document.lineAt(nextLineNumber);
-                    if (/}/.test(nextLine.text)) {
-                        this.constructorEndLine = nextLine;
-                        break;
-                    }
-                }
-            } 
-        }
+        this.parseDocument(document);
 
         if (!this.classLine) {
             return;
@@ -99,7 +30,7 @@ class AddProperty {
         }
     }
 
-    insertConstructor() {
+    insertConstructor(shouldInsertPropertyStatement = true) {
         let insertLine = this.classLine;
 
         if (this.lastTraitLine) {
@@ -116,7 +47,9 @@ class AddProperty {
             snippet += "\n";
         }
 
-        snippet += this.indentText(this.getPropertyStatementText());
+        if (shouldInsertPropertyStatement === true) {
+            snippet += this.indentText(this.getPropertyStatementText());
+        }
 
         const visibility = this.config('phpAddProperty.constructor.visibility.default');
         let constructorText = this.indentText(
@@ -158,9 +91,8 @@ class AddProperty {
         this.replaceWithSnippet(snippet, range);
     }
 
-    insertProperty() {
-        // Add property statement;
-        let text = this.indentText(this.getPropertyStatementText());
+    insertProperty(shouldInsertPropertyStatement = true) {
+        let text = shouldInsertPropertyStatement === true ? this.indentText(this.getPropertyStatementText()) : '';
 
         // Add property to constructor parameters
         let constructorText = this.escapeForSnippet(
@@ -386,6 +318,79 @@ class AddProperty {
             constructorParameterType: 5,
             constructorParameterStop: 6
         };
+    }
+
+    parseDocument(document) {
+        for (let lineNumber = 0; lineNumber < document.lineCount; lineNumber++) {
+            const line = document.lineAt(lineNumber);
+            const textLine = line.text;
+            
+            if (/class\s+\w+/.test(textLine)) {
+                this.classLine = line;
+                if (! /{/.test(textLine)) {
+                    for (let nextLineNumber = lineNumber + 1; nextLineNumber < document.lineCount; nextLineNumber++) {
+                        const nextLine = document.lineAt(nextLineNumber);
+                        if (/{/.test(nextLine.text)) {
+                            this.classLine = nextLine;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (this.classLine && /use\s+\w+/.test(textLine)) {
+                this.lastTraitLine = line;
+            }
+
+            if (/(public|protected|private|static)\s+\$\w+.*;/.test(textLine) || /const\s+\w+.*;/.test(textLine)) {
+                this.lastPropertyLine = line;
+            }
+
+            if (/function __construct/.test(textLine)) {
+                this.constructorStartLine = line;
+                let previousLineNumber = lineNumber - 1;
+                if (previousLineNumber > 0) {
+                    let previousLine = document.lineAt(previousLineNumber);
+                    
+                    if (/\*\//.test(previousLine.text)) {
+                        for (previousLineNumber--; previousLineNumber > 0; previousLineNumber--) {
+                            previousLine = document.lineAt(previousLineNumber);
+                            if (/\/\*\*/.test(previousLine.text)) {
+                                this.constructorStartLine = previousLine;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                for (let ln = lineNumber; ln < document.lineCount; ln++) {
+                    const l = document.lineAt(ln);
+                    const tl = l.text;
+
+                    if (/\$\w+/.test(tl)) {
+                        this.constructorLastParameterLine = l;
+                    }
+
+                    if (/\)(?!\))/.test(tl)) {
+                        this.constructorParametersCloseLine = l;
+                    }
+
+                    if (/{/.test(tl)) {
+                        this.isMultiLineConstructor = this.constructorParametersCloseLine.lineNumber !== lineNumber;
+                        break;
+                    }
+                }
+                
+
+                for (let nextLineNumber = lineNumber + 1; nextLineNumber < document.lineCount; nextLineNumber++) {
+                    const nextLine = document.lineAt(nextLineNumber);
+                    if (/}/.test(nextLine.text)) {
+                        this.constructorEndLine = nextLine;
+                        break;
+                    }
+                }
+            } 
+        }
     }
 }
 
