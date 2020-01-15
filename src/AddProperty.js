@@ -45,7 +45,8 @@ class AddProperty {
         }
 
         const editor = this.activeEditor();
-        const line = document.lineAt(editor.selection.active.line);
+        const selectionLineNumber = editor.selection.active.line;
+        const line = document.lineAt(selectionLineNumber);
             
         if (!line.text.includes('$')) {
             return;
@@ -61,6 +62,27 @@ class AddProperty {
 
         if (this.name === undefined || this.name.trim() === "") {
             return;
+        }
+
+        let previousLineNumber = selectionLineNumber - 1;
+
+        if (previousLineNumber > 0) {
+            let previousLine = editor.document.lineAt(previousLineNumber);
+
+            if (/\*\//.test(previousLine.text)) {
+                for (previousLineNumber; previousLineNumber > 0; previousLineNumber--) {
+                    previousLine = document.lineAt(previousLineNumber);
+                    const typeMatch = /@var\s(\S*)/.exec(previousLine.text);
+
+                    if (typeMatch) {
+                        this.type = typeMatch[1];
+                    }
+
+                    if (/\/\*\*/.test(previousLine.text)) {
+                        break;
+                    }
+                }
+            }
         }
 
         if (! /function __construct/gm.test(this.activeEditor().document.getText())) {
@@ -98,12 +120,9 @@ class AddProperty {
                 : `${visibility} `
             );
 
-        let tabStopsText = `\$${this.tabStops.constructorParameterType}`;
-        if (this.config('phpAddProperty.property.stopToImport') === true) {
-            tabStopsText += `\$${this.tabStops.constructorParameterStop}`;
-        }
+        const parameterText = this.getParameterText();
 
-        constructorText += `function __construct(${tabStopsText}\\$${this.name})\n`
+        constructorText += `function __construct(${parameterText})\n`
             + this.indentText('{\n')
             + this.indentText(`\\$this->${this.name} = \\$${this.name};\$0\n`, 2)
             + this.indentText('}');
@@ -159,12 +178,7 @@ class AddProperty {
         // Zero-based to one-based
         position++;
 
-        let tabStopsText = `$${this.tabStops.constructorParameterType}`;
-        if (this.config('phpAddProperty.property.stopToImport') === true) {
-            tabStopsText += `$${this.tabStops.constructorParameterStop}`;
-        }
-
-        const newParameterText = `$${tabStopsText}\\$${this.name}`;
+        const newParameterText = this.getParameterText();
         let newParameterWrapper = ',';
         if (this.isMultiLineConstructor) {
             newParameterWrapper += "\n" + this.indentText(
@@ -293,6 +307,28 @@ class AddProperty {
         return propertyStatementText;
     }
 
+    getParameterText() {
+        let tabStopsText = `$${this.tabStops.constructorParameterType}`;
+
+        if (this.type) {
+            tabStopsText = `\${${this.tabStops.constructorParameterType}:${this.type}}`;
+        }
+
+        if (this.config('phpAddProperty.property.stopToImport') === true) {
+            tabStopsText += `$${this.tabStops.constructorParameterStop}`;
+        }
+
+        let parameterText = `${tabStopsText}`;
+
+        if (this.type) {
+            parameterText += ' ';
+        }
+
+        parameterText += `\\$${this.name}`;
+
+        return parameterText;
+    }
+
     replaceWithSnippet(text, range) {
         const rangeLines = range.end.line - range.start.line;
 
@@ -349,6 +385,7 @@ class AddProperty {
         delete this.constructorEndLine;
         delete this.isMultiLineConstructor;
         delete this.name;
+        delete this.type;
 
         this.tabStops = {
             propertyDocblockType: 1,
