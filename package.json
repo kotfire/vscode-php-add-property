@@ -126,6 +126,11 @@
 					"type": "integer",
 					"default": 120,
 					"description": "Specifies the maximum line length before using a multiline constructor"
+				},
+				"phpAddProperty.showMessagesOnStatusBar": {
+					"type": "boolean",
+					"default": false,
+					"description": "Specifies whether to show messages on status bar instead of notification box"
 				}
 			}
 		}

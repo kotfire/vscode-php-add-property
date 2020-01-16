@@ -175,6 +175,8 @@ class AddProperty {
             });
             
             if (parameters.includes(this.name)) {
+                this.showErrorMessage('Property already exists as constructor argument');
+
                 return;
             }
         }
@@ -406,6 +408,24 @@ class AddProperty {
         const configuration = vscode.workspace.getConfiguration(parts[0], this.activeEditor().document.uri);
             
         return parts[1] ? configuration.get(parts[1]) : configuration;
+    }
+
+    showMessage(message, isError = false) {
+        if (this.config('phpAddProperty.showMessagesOnStatusBar')) {
+            return vscode.window.setStatusBarMessage(message, 3000);
+        }
+
+        message = message.replace(/\$\(.+?\)\s\s/, '');
+
+        if (isError) {
+            vscode.window.showErrorMessage(message);
+        } else {
+            vscode.window.showInformationMessage(message);
+        }
+    }
+
+    showErrorMessage(message) {
+        this.showMessage(message, true);
     }
 
     reset() {
