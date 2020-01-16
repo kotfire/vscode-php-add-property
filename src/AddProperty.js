@@ -109,7 +109,7 @@ class AddProperty {
             snippet += "\n";
         }
 
-        if (shouldInsertPropertyStatement === true) {
+        if (shouldInsertPropertyStatement === true && !this.classProperties.includes(this.name)) {
             snippet += this.indentText(this.getPropertyStatementText());
         }
 
@@ -151,7 +151,9 @@ class AddProperty {
     }
 
     insertProperty(shouldInsertPropertyStatement = true) {
-        let text = shouldInsertPropertyStatement === true ? this.indentText(this.getPropertyStatementText()) : '';
+        let text = shouldInsertPropertyStatement === true && !this.classProperties.includes(this.name)
+            ? this.indentText(this.getPropertyStatementText())
+            : '';
 
         // Add property to constructor parameters
         let constructorText = this.escapeForSnippet(
@@ -162,6 +164,31 @@ class AddProperty {
                 )
             )
         );
+
+        // Check if property already exists as argument
+        const constructorMatch = /function\s+__construct\s*\(((?:\s|\S)*)(?=\))\s*\)/.exec(constructorText);
+        if (constructorMatch) {
+            const parametersText = constructorMatch[1];
+            const parameters = parametersText.split(',').flatMap(parameter => {
+                const match = parameter.trim().match(/\$(\S+)/);
+                return match ? [match[1]] : [];
+            });
+            
+            if (parameters.includes(this.name)) {
+                return;
+            }
+        }
+
+        // Check if property has been already assignated
+        let propertyAssignationExists = false;
+        const assignationRegex = /\$this->(\S+)\s*=[^;]*;/g;
+        let assignationMatch;
+        while (assignationMatch = assignationRegex.exec(constructorText)) {
+            if (assignationMatch[1] === this.name) {
+                propertyAssignationExists = true;
+                break;
+            }
+        }
 
         const constructorLastParameterText = this.escapeForSnippet(
             this.activeEditor().document.getText(this.constructorLastParameterLine.range)
@@ -203,8 +230,10 @@ class AddProperty {
 
         text += constructorText;
         
-        // Initialize property to parameter
-        text += this.indentText(`\\$this->${this.name} = \\$${this.name};\$0\n`, 2);
+        if (!propertyAssignationExists) {
+            // Initialize property to parameter
+            text += this.indentText(`\\$this->${this.name} = \\$${this.name};\$0\n`, 2);
+        }
 
         // Close constructor
         text += this.constructorEndLine.text;
@@ -391,6 +420,8 @@ class AddProperty {
         delete this.name;
         delete this.type;
 
+        this.classProperties = [];
+
         this.tabStops = {
             propertyDocblockType: 1,
             propertyDocblockImport: 2,
@@ -424,6 +455,12 @@ class AddProperty {
             }
 
             if (this.isPropertyLine(textLine) || /const\s+\w+.*;/.test(textLine)) {
+                const match = /\$([^\s;]*)/.exec(line.text);
+
+                if (match) {
+                    this.classProperties.push(match[1]);
+                }
+
                 this.lastPropertyLine = line;
             }
 
