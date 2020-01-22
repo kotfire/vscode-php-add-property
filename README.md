@@ -49,3 +49,4 @@ This extension contributes the following settings:
 * `phpAddProperty.constructor.breakIntoMultilineIfLengthExceeded.enabled`: Specifies whether to break the constructor into multiple lines if the given line length is exceeded
 * `phpAddProperty.constructor.breakIntoMultilineIfLengthExceeded.maxLineLength`: Specifies the maximum line length before using a multiline constructor
 * `phpAddProperty.showMessagesOnStatusBar`: Specifies whether to show messages on status bar instead of notification box
+* `phpAddProperty.showContextMenuOptions`: Specifies whether to show the context menu options

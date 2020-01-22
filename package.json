@@ -4,7 +4,7 @@
 	"description": "Quick way to add PHP class properties",
 	"publisher": "kotfire",
 	"license": "SEE LICENSE IN LICENSE",
-	"version": "0.2.1",
+	"version": "0.3.0",
 	"engines": {
 		"vscode": "^1.38.0"
 	},

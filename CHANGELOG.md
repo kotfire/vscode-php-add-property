@@ -1,3 +1,9 @@
+## 0.3.0 (2020-01-22)
+
+### Added
+- Add a new command to add existing properties to the constructor
+- Add a new option to enable/disable the context menu options
+
 ## 0.2.1 (2019-12-19)
 
 ### Fixed
