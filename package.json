@@ -21,7 +21,9 @@
 	],
 	"icon": "images/icon.png",
 	"activationEvents": [
-		"onCommand:phpAddProperty.add"
+		"onLanguage:php",
+		"onCommand:phpAddProperty.add",
+		"onCommand:phpAddProperty.append"
 	],
 	"main": "./src/extension.js",
 	"contributes": {
@@ -29,8 +31,28 @@
 			{
 				"command": "phpAddProperty.add",
 				"title": "Add PHP Property"
+			},
+			{
+				"command": "phpAddProperty.append",
+				"title": "Add Existing PHP Property"
 			}
 		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "phpAddProperty.append",
+					"when": "editorLangId == php"
+				}
+			],
+			"editor/context": [
+				{
+					"when": "resourceLangId == php",
+					"command": "phpAddProperty.append",
+					"alt": "phpAddProperty.append",
+					"group": "0_phpAddProperty@1"
+				}
+			]
+		},
 		"configuration": {
 			"type": "object",
 			"title": "PHP Add Property",
@@ -104,6 +126,11 @@
 					"type": "integer",
 					"default": 120,
 					"description": "Specifies the maximum line length before using a multiline constructor"
+				},
+				"phpAddProperty.showMessagesOnStatusBar": {
+					"type": "boolean",
+					"default": false,
+					"description": "Specifies whether to show messages on status bar instead of notification box"
 				}
 			}
 		}

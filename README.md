@@ -12,6 +12,12 @@ Visual Code Studio extension to quickly add PHP class properties
 
 ![Add a property demo](images/add.gif)
 
+### Add existing properties
+
+> It gets the property type from the docblock!
+
+![Add existing properties demo](images/existing.gif)
+
 ### Insert constructor
 
 Automatically insert a constructor if it does not exist.
@@ -42,3 +48,4 @@ This extension contributes the following settings:
 * `phpAddProperty.constructor.visibility.default`: Specifies the default constructor visibility
 * `phpAddProperty.constructor.breakIntoMultilineIfLengthExceeded.enabled`: Specifies whether to break the constructor into multiple lines if the given line length is exceeded
 * `phpAddProperty.constructor.breakIntoMultilineIfLengthExceeded.maxLineLength`: Specifies the maximum line length before using a multiline constructor
+* `phpAddProperty.showMessagesOnStatusBar`: Specifies whether to show messages on status bar instead of notification box
