@@ -1,4 +1,4 @@
-## 0.3.0 (2020-01-22)
+## 0.3.1 (2020-01-22)
 
 ### Added
 - Add a new command to add existing properties to the constructor
