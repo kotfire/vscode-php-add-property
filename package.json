@@ -46,10 +46,16 @@
 			],
 			"editor/context": [
 				{
-					"when": "resourceLangId == php",
+					"when": "resourceLangId == php && config.phpAddProperty.showContextMenuOptions",
+					"command": "phpAddProperty.add",
+					"alt": "phpAddProperty.add",
+					"group": "0_phpAddProperty@1"
+				},
+				{
+					"when": "resourceLangId == php && config.phpAddProperty.showContextMenuOptions",
 					"command": "phpAddProperty.append",
 					"alt": "phpAddProperty.append",
-					"group": "0_phpAddProperty@1"
+					"group": "0_phpAddProperty@2"
 				}
 			]
 		},
@@ -131,6 +137,11 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Specifies whether to show messages on status bar instead of notification box"
+				},
+				"phpAddProperty.showContextMenuOptions": {
+					"type": "boolean",
+					"default": false,
+					"description": "Specifies whether to show the context menu options"
 				}
 			}
 		}
