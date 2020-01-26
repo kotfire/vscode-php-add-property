@@ -466,6 +466,18 @@ class AddProperty {
         return index;
     }
 
+    getLineTextFromFirstNonIndentationCharacter(line) {
+        let i = 0;
+
+        for (i; i < line.text.length; i++) {
+            if (/[^\s\t]/.test(line.text[i])) {
+                break;
+            }
+        }
+
+        return line.text.substr(i);
+    }
+
     calculateIndentationLevel(index) {
         return Math.floor(index / this.configUsingResource('editor.tabSize'));
     }
@@ -543,12 +555,12 @@ class AddProperty {
             const line = document.lineAt(lineNumber);
             const textLine = line.text;
             
-            if (/class\s+\w+/.test(textLine)) {
+            if (/^(?:(?:final|abstract)\s+)?class\s+\w+/.test(this.getLineTextFromFirstNonIndentationCharacter(line))) {
                 this.classLine = line;
-                if (! /{/.test(textLine)) {
+                if (! /^{/.test(this.getLineTextFromFirstNonIndentationCharacter(line))) {
                     for (let nextLineNumber = lineNumber + 1; nextLineNumber < document.lineCount; nextLineNumber++) {
                         const nextLine = document.lineAt(nextLineNumber);
-                        if (/{/.test(nextLine.text)) {
+                        if (/^{/.test(this.getLineTextFromFirstNonIndentationCharacter(nextLine))) {
                             this.classLine = nextLine;
                             break;
                         }
@@ -556,11 +568,14 @@ class AddProperty {
                 }
             }
 
-            if (this.classLine && /use\s+\w+/.test(textLine)) {
+            if (this.classLine && /^use\s+\w+/.test(this.getLineTextFromFirstNonIndentationCharacter(line))) {
                 this.lastTraitLine = line;
             }
 
-            if (this.isPropertyLine(textLine) || /const\s+\w+.*;/.test(textLine)) {
+            const isPropertyOrConstantLine = this.isPropertyLine(this.getLineTextFromFirstNonIndentationCharacter(line))
+                || /^const\s+\w+.*;/.test(this.getLineTextFromFirstNonIndentationCharacter(line));
+
+            if (isPropertyOrConstantLine) {
                 const match = /\$([^\s;]*)/.exec(line.text);
 
                 if (match) {
@@ -576,7 +591,7 @@ class AddProperty {
                 if (previousLineNumber > 0) {
                     let previousLine = document.lineAt(previousLineNumber);
                     
-                    if (/\*\//.test(previousLine.text)) {
+                    if (/^\*\//.test(this.getLineTextFromFirstNonIndentationCharacter(previousLine))) {
                         this.constructorDocblockEndLine = previousLine;
                         let paramLine;
 
@@ -589,7 +604,7 @@ class AddProperty {
                                 this.lastDocBlockParamLine = previousLine;
                             }
 
-                            if (/\/\*\*/.test(previousLine.text)) {
+                            if (/^\/\*\*/.test(this.getLineTextFromFirstNonIndentationCharacter(previousLine))) {
                                 this.constructorDocblockStartLine = previousLine;
                                 this.constructorStartLine = previousLine;
                                 break;
@@ -619,7 +634,7 @@ class AddProperty {
 
                 for (let nextLineNumber = lineNumber + 1; nextLineNumber < document.lineCount; nextLineNumber++) {
                     const nextLine = document.lineAt(nextLineNumber);
-                    if (/}/.test(nextLine.text)) {
+                    if (/^}/.test(this.getLineTextFromFirstNonIndentationCharacter(nextLine))) {
                         this.constructorEndLine = nextLine;
                         break;
                     }
