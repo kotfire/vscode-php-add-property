@@ -113,6 +113,13 @@ class AddProperty {
             snippet += this.indentText(this.getPropertyStatementText());
         }
 
+        if (this.config('phpAddProperty.constructor.docblock.enable') === true) {
+            snippet += this.indentText("/**\n")
+                + this.indentText(" * Constructor.\n")
+                + this.indentText(`${this.getConstructorParamDocblockText()}\n`)
+                + this.indentText(" */\n")
+        }
+
         const visibility = this.config('phpAddProperty.constructor.visibility.default');
         let constructorText = this.indentText(
             this.config('phpAddProperty.constructor.visibility.choose') === true
