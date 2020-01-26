@@ -155,7 +155,6 @@ class AddProperty {
             ? this.indentText(this.getPropertyStatementText())
             : '';
 
-        // Add property to constructor parameters
         let constructorText = this.escapeForSnippet(
             this.activeEditor().document.getText(
                 new vscode.Range(
@@ -164,6 +163,33 @@ class AddProperty {
                 )
             )
         );
+
+        // Update docblock parameters
+        const shouldUpdateDocblockParameters = this.config('phpAddProperty.constructor.docblock.enable') === true
+            && this.constructorDocblockStartLine
+            && !this.docblockParams.includes(this.name);
+
+        if (shouldUpdateDocblockParameters) {
+            let docblockText = this.escapeForSnippet(
+                this.activeEditor().document.getText(
+                    new vscode.Range(
+                        this.constructorDocblockStartLine.range.start,
+                        this.constructorDocblockEndLine.rangeIncludingLineBreak.start
+                    )
+                )
+            );
+
+            const newDocblockText = docblockText
+                + this.indentText(
+                    this.getConstructorParamDocblockText(),
+                    this.calculateIndentationLevel(
+                        this.getLineFirstNonIndentationCharacterIndex(this.constructorDocblockStartLine)
+                    )
+                )
+                + "\n";
+
+            constructorText = constructorText.replace(docblockText, newDocblockText);
+        }        
 
         // Check if property already exists as argument
         const constructorMatch = /function\s+__construct\s*\(((?:\s|\S)*)(?=\))\s*\)/.exec(constructorText);
@@ -192,6 +218,7 @@ class AddProperty {
             }
         }
 
+        // Add property to constructor parameters
         const constructorLastParameterText = this.escapeForSnippet(
             this.activeEditor().document.getText(this.constructorLastParameterLine.range)
         );
@@ -212,7 +239,9 @@ class AddProperty {
         if (this.isMultiLineConstructor) {
             newParameterWrapper += "\n" + this.indentText(
                 newParameterText,
-                this.calculateIndentationLevel(this.constructorLastParameterLine.firstNonWhitespaceCharacterIndex)
+                this.calculateIndentationLevel(
+                    this.getLineFirstNonIndentationCharacterIndex(this.constructorLastParameterLine)
+                )
             );
         } else {
             newParameterWrapper += ` ${newParameterText}`;
@@ -338,6 +367,31 @@ class AddProperty {
         return propertyStatementText;
     }
 
+    getConstructorParamDocblockText() {
+        let docblockTypeStop = this.tabStops.constructorDocblockType;
+        let dockblockImportStop = this.tabStops.constructorDocblockImport;
+
+        if (this.config('phpAddProperty.constructor.docblock.withParameter') === true) {
+            docblockTypeStop = this.tabStops.constructorParameterType;
+            dockblockImportStop = this.tabStops.constructorParameterStop;
+            this.tabStops.constructorParameterStop++;
+        }
+
+        let constructorParamDocblockText = '';
+
+        if (this.config('phpAddProperty.constructor.docblock.stopToImport') === true) {
+            constructorParamDocblockText += `\$${dockblockImportStop}`;
+        }
+            
+        constructorParamDocblockText += `\$${docblockTypeStop} \\$${this.name}`;
+
+        if (this.config('phpAddProperty.constructor.docblock.stopForDescription') === true) {
+            constructorParamDocblockText += `\$${this.tabStops.constructorDocblockDescription}`;
+        }
+
+        return ` * @param ${constructorParamDocblockText}`;
+    }
+
     getParameterText() {
         let tabStopsText = `$${this.tabStops.constructorParameterType}`;
 
@@ -387,12 +441,30 @@ class AddProperty {
         );
     }
 
+    getLineFirstNonIndentationCharacterIndex(line) {
+        const tabSize = this.configUsingResource('editor.tabSize');
+
+        let index = 0;
+        for (let i = 0; i < line.text.length; i++) {
+            const char = line.text[i];
+
+            if (/[^\s\t]/.test(char)) {
+                index++;
+                break;
+            }
+
+            index += char === "\t" ? tabSize : 1;
+        }
+
+        return index;
+    }
+
     calculateIndentationLevel(index) {
         return Math.floor(index / this.configUsingResource('editor.tabSize'));
     }
 
     escapeForSnippet(text) {
-        return text.replace(/\$/g, '\\$');
+        return text.replace(/(?<!\\)\$/g, '\\$');
     }
 
     activeEditor() {
@@ -436,19 +508,26 @@ class AddProperty {
         delete this.constructorLastParameterLine;
         delete this.constructorParametersCloseLine;
         delete this.constructorEndLine;
+        delete this.constructorDocblockStartLine;
+        delete this.constructorDocblockEndLine;
+        delete this.lastDocBlockParamLine;
         delete this.isMultiLineConstructor;
         delete this.name;
         delete this.type;
 
         this.classProperties = [];
+        this.docblockParams = [];
 
         this.tabStops = {
             propertyDocblockType: 1,
             propertyDocblockImport: 2,
             propertyVisibility: 3,
-            constructorVisibility: 4,
-            constructorParameterType: 5,
-            constructorParameterStop: 6
+            constructorDocblockType: 4,
+            constructorDocblockImport: 5,
+            constructorDocblockDescription: 6,
+            constructorVisibility: 7,
+            constructorParameterType: 8,
+            constructorParameterStop: 9
         };
     }
 
@@ -491,9 +570,20 @@ class AddProperty {
                     let previousLine = document.lineAt(previousLineNumber);
                     
                     if (/\*\//.test(previousLine.text)) {
+                        this.constructorDocblockEndLine = previousLine;
+                        let paramLine;
+
                         for (previousLineNumber--; previousLineNumber > 0; previousLineNumber--) {
                             previousLine = document.lineAt(previousLineNumber);
+                            paramLine = /@param(?:\s+\S+)\s+\$(\S+)/.exec(previousLine.text);
+
+                            if (paramLine) {
+                                this.docblockParams.push(paramLine[1]);
+                                this.lastDocBlockParamLine = previousLine;
+                            }
+
                             if (/\/\*\*/.test(previousLine.text)) {
+                                this.constructorDocblockStartLine = previousLine;
                                 this.constructorStartLine = previousLine;
                                 break;
                             }
