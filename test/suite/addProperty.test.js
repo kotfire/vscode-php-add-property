@@ -11,6 +11,10 @@ suite('Add Property', function () {
         await resetDefaultSettings();
     });
 
+    teardown(async () => {
+        await resetDefaultSettings();
+    });
+
     test('Should insert property and constructor in an empty class', async () => {
         await runFixture('EmptyClass.php');
     });

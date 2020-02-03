@@ -11,6 +11,10 @@ suite('Customizations', function () {
         await resetDefaultSettings();
     });
 
+    teardown(async () => {
+        await resetDefaultSettings();
+    });
+
     test('Should use the specified property default visibility', async () => {
         await vscode.workspace.getConfiguration('phpAddProperty').update('property.visibility.default', 'public', true);
         await runFixture('PropertyDefaultVisibility.php');

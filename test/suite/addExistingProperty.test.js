@@ -11,6 +11,10 @@ suite('Add Existing Property', function () {
         await resetDefaultSettings();
     });
 
+    teardown(async () => {
+        await resetDefaultSettings();
+    });
+
     test('Should add an existing property and constructor in an empty class', async () => {
         await runFixture('EmptyClass.php', new vscode.Position(7, 0));
     });
