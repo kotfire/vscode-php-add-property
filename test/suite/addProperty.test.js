@@ -42,6 +42,16 @@ suite('Add Property', function () {
     test('Should work with tab indentation', async () => {
         await runFixture('TabIndentation.php');
     });
+
+    test('Should add a docblock with @param along with the constructor', async () => {
+        await vscode.workspace.getConfiguration('phpAddProperty').update('constructor.docblock.enable', true, true);
+        await runFixture('AddConstructorDocblock.php');
+    });
+
+    test('Should update the docblock adding the new @param', async () => {
+        await vscode.workspace.getConfiguration('phpAddProperty').update('constructor.docblock.enable', true, true);
+        await runFixture('UpdateConstructorDocblock.php');
+    });
 });
 
 async function runFixture(fileName) {
