@@ -384,13 +384,17 @@ class AddProperty {
             this.tabStops.constructorParameterStop++;
         }
 
-        let constructorParamDocblockText = '';
+        let constructorParamDocblockText = `\${${docblockTypeStop}}`;
+
+        if (this.type) {
+            constructorParamDocblockText = `\${${docblockTypeStop}:${this.type} }`;
+        }
 
         if (this.config('phpAddProperty.constructor.docblock.stopToImport') === true) {
             constructorParamDocblockText += `\$${dockblockImportStop}`;
         }
             
-        constructorParamDocblockText += `\$${docblockTypeStop} \\$${this.name}`;
+        constructorParamDocblockText += `\\$${this.name}`;
 
         if (this.config('phpAddProperty.constructor.docblock.stopForDescription') === true) {
             constructorParamDocblockText += `\$${this.tabStops.constructorDocblockDescription}`;

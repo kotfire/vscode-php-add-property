@@ -26,6 +26,11 @@ suite('Add Existing Property', function () {
     test('Should add an existing property using type from docblock', async () => {
         await runFixture('UseDocblock.php', new vscode.Position(8, 0));
     });
+
+    test('Should add a docblock with @param using type from property docblock', async () => {
+        await vscode.workspace.getConfiguration('phpAddProperty').update('constructor.docblock.enable', true, true);
+        await runFixture('ConstructorDocblockUsingDocblock.php', new vscode.Position(8, 0));
+    });
 });
 
 async function runFixture(fileName, cursorPosition) {

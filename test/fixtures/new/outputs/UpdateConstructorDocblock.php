@@ -11,7 +11,7 @@ class Jedi
 
     /**
      * @param $rank Rank
-     * @param  $name
+     * @param $name
      */
     public function __construct($rank, $name)
     {
