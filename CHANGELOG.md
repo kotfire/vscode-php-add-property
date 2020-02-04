@@ -1,3 +1,8 @@
+## 0.4.0 (2020-02-04)
+
+### Added
+- Add a new option to add/update @param in the constructor docblock
+
 ## 0.3.1 (2020-01-22)
 
 ### Added
