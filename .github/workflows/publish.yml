@@ -20,5 +20,5 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install
-    - run: echo ::set-env name=VERSION::$(npm run version)
+    - run: echo ::set-env name=VERSION::$(npx -c 'echo "$npm_package_version"')
     - run: npx vsce publish $VERSION -p ${{ secrets.VSCE_TOKEN}}
