@@ -19,6 +19,10 @@ suite('Add Existing Property', function () {
         await runFixture('EmptyClass.php', new vscode.Position(7, 0));
     });
 
+    test('Should add an existing property to an empty constructor', async () => {
+        await runFixture('EmptyConstructor.php', new vscode.Position(7, 0));
+    });
+
     test('Should add an existing property to an existing constructor', async () => {
         await runFixture('ExistingConstructor.php', new vscode.Position(9, 0));
     });
