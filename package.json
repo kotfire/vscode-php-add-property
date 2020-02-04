@@ -101,12 +101,32 @@
 				"phpAddProperty.property.docblock.stopToImport": {
 					"type": "boolean",
 					"default": false,
-					"description": "Specifies whether to stop after typing the type to refer to an external fully qualified name with an alias or importing"
+					"description": "Specifies whether to stop after typing the @var type to refer to an external fully qualified name with an alias or importing"
 				},
 				"phpAddProperty.property.types": {
 					"type": "boolean",
 					"default": false,
 					"markdownDescription": "Specifies whether to enable PHP 7.4+ typed properties [More info](https://wiki.php.net/rfc/typed_properties_v2)"
+				},
+				"phpAddProperty.constructor.docblock.enable": {
+					"type": "boolean",
+					"default": false,
+					"description": "Specifies whether to add/update the docblock to the constructor"
+				},
+				"phpAddProperty.constructor.docblock.withParameter": {
+					"type": "boolean",
+					"default": false,
+					"description": "Specifies whether to add the docblock @param type together with the constructor parameter type"
+				},
+				"phpAddProperty.constructor.docblock.stopToImport": {
+					"type": "boolean",
+					"default": false,
+					"description": "Specifies whether to stop after typing the @param type to refer to an external fully qualified name with an alias or importing"
+				},
+				"phpAddProperty.constructor.docblock.stopForDescription": {
+					"type": "boolean",
+					"default": true,
+					"description": "Specifies whether to stop after typing the @var type to add a description"
 				},
 				"phpAddProperty.constructor.visibility.choose": {
 					"type": "boolean",

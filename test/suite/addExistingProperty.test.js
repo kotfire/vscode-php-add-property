@@ -11,6 +11,10 @@ suite('Add Existing Property', function () {
         await resetDefaultSettings();
     });
 
+    teardown(async () => {
+        await resetDefaultSettings();
+    });
+
     test('Should add an existing property and constructor in an empty class', async () => {
         await runFixture('EmptyClass.php', new vscode.Position(7, 0));
     });
@@ -21,6 +25,11 @@ suite('Add Existing Property', function () {
 
     test('Should add an existing property using type from docblock', async () => {
         await runFixture('UseDocblock.php', new vscode.Position(8, 0));
+    });
+
+    test('Should add a docblock with @param using type from property docblock', async () => {
+        await vscode.workspace.getConfiguration('phpAddProperty').update('constructor.docblock.enable', true, true);
+        await runFixture('ConstructorDocblockUsingDocblock.php', new vscode.Position(8, 0));
     });
 });
 
