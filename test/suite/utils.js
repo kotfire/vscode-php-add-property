@@ -1,6 +1,6 @@
 const vscode = require('vscode');
 
-const waitToAssertInSeconds = 5;
+const waitToAssertInSeconds = 15;
 
 exports.waitToAssertInSeconds = waitToAssertInSeconds;
 
