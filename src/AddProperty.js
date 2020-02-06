@@ -23,7 +23,7 @@ class AddProperty {
             return;
         }
 
-        if (! /function __construct/gm.test(document.getText())) {
+        if (!this.constructorStartLine) {
             this.insertConstructor();
         } else {
             this.insertProperty();
@@ -588,6 +588,14 @@ class AddProperty {
                 }
 
                 this.lastPropertyLine = line;
+            }
+
+            const lineIsOpenBracketAfterClass = this.classLine
+                && this.classLine.lineNumber != line.lineNumber
+                && /^{/.test(this.getLineTextFromFirstNonIndentationCharacter(line));
+
+            if (lineIsOpenBracketAfterClass) {
+                break;
             }
 
             if (/function __construct/.test(textLine)) {

@@ -47,6 +47,10 @@ suite('Add Property', function () {
         await runFixture('TabIndentation.php');
     });
 
+    test('Should work when the class contains extra "class" keywords', async () => {
+        await runFixture('ClassKeyword.php');
+    });
+
     test('Should add a docblock with @param along with the constructor', async () => {
         await vscode.workspace.getConfiguration('phpAddProperty').update('constructor.docblock.enable', true, true);
         await runFixture('AddConstructorDocblock.php');
