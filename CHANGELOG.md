@@ -1,3 +1,9 @@
+## 0.4.1 (2020-02-06)
+
+### Fixed
+- Property won't be added if the constructor exists but is empty
+- [#13](https://github.com/kotfire/vscode-php-add-property/issues/13) Adding a property does not work when using anonymous classes inside the class
+
 ## 0.4.0 (2020-02-04)
 
 ### Added
