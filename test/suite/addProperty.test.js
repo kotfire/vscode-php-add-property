@@ -19,6 +19,10 @@ suite('Add Property', function () {
         await runFixture('EmptyClass.php');
     });
 
+    test('Should insert a new property and add it to an empty constructor', async () => {
+        await runFixture('EmptyConstructor.php');
+    });
+
     test('Should insert a new property and add it to an existing constructor', async () => {
         await runFixture('ExistingConstructor.php');
     });

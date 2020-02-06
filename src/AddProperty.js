@@ -226,12 +226,13 @@ class AddProperty {
         }
 
         // Add property to constructor parameters
+        const constructorParameterLastLine = this.constructorLastParameterLine || this.constructorParametersCloseLine;
         const constructorLastParameterText = this.escapeForSnippet(
-            this.activeEditor().document.getText(this.constructorLastParameterLine.range)
+            this.activeEditor().document.getText(constructorParameterLastLine.range)
         );
 
-        let position = this.constructorLastParameterLine.range.end.character;
-        if (this.constructorLastParameterLine.lineNumber === this.constructorParametersCloseLine.lineNumber) {
+        let position = constructorParameterLastLine.range.end.character;
+        if (constructorParameterLastLine.lineNumber === this.constructorParametersCloseLine.lineNumber) {
             const match = /\)(?!\))/.exec(constructorLastParameterText);
             if (match) {
                 position = match.index - 1;
@@ -242,16 +243,16 @@ class AddProperty {
         position++;
 
         const newParameterText = this.getParameterText();
-        let newParameterWrapper = ',';
+        let newParameterWrapper = this.constructorLastParameterLine ? ',' : '';
         if (this.isMultiLineConstructor) {
             newParameterWrapper += "\n" + this.indentText(
                 newParameterText,
                 this.calculateIndentationLevel(
-                    this.getLineFirstNonIndentationCharacterIndex(this.constructorLastParameterLine)
+                    this.getLineFirstNonIndentationCharacterIndex(constructorParameterLastLine)
                 )
             );
         } else {
-            newParameterWrapper += ` ${newParameterText}`;
+            newParameterWrapper += (this.constructorLastParameterLine ? ' ' : '') + newParameterText;
         }
 
         const output = [
