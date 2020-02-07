@@ -1,3 +1,11 @@
+## 0.5.0 (2020-02-07)
+
+### Added
+- Support to insert properties in different classes on the same file
+
+### Fixed
+- The file indentation was not respected sometimes
+
 ## 0.4.1 (2020-02-06)
 
 ### Fixed
