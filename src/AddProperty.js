@@ -590,11 +590,11 @@ class AddProperty {
                 this.lastPropertyLine = line;
             }
 
-            const lineIsOpenBracketAfterClass = this.classLine
+            const lineIsBracketAfterClass = this.classLine
                 && this.classLine.lineNumber != line.lineNumber
-                && /^{/.test(this.getLineTextFromFirstNonIndentationCharacter(line));
+                && /^{|}/.test(this.getLineTextFromFirstNonIndentationCharacter(line));
 
-            if (lineIsOpenBracketAfterClass) {
+            if (lineIsBracketAfterClass) {
                 break;
             }
 

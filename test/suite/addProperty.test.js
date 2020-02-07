@@ -51,6 +51,10 @@ suite('Add Property', function () {
         await runFixture('ClassKeyword.php');
     });
 
+    test('Should insert property in the first class if the file contains multiple', async () => {
+        await runFixture('MultipleClasses.php');
+    });
+
     test('Should add a docblock with @param along with the constructor', async () => {
         await vscode.workspace.getConfiguration('phpAddProperty').update('constructor.docblock.enable', true, true);
         await runFixture('AddConstructorDocblock.php');
