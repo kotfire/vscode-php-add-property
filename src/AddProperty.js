@@ -109,30 +109,57 @@ class AddProperty {
             snippet += "\n";
         }
 
+        let insertLineIndentation = this.calculateIndentationLevel(
+            this.getLineFirstNonIndentationCharacterIndex(insertLine)
+        );
+
+        if (/{\s*$/.test(insertLine.text)) {
+            insertLineIndentation++;
+        }
+
         if (shouldInsertPropertyStatement === true && !this.classProperties.includes(this.name)) {
-            snippet += this.indentText(this.getPropertyStatementText());
+            snippet += this.indentText(
+                this.getPropertyStatementText(),
+                insertLineIndentation
+            );
         }
 
         if (this.config('phpAddProperty.constructor.docblock.enable') === true) {
-            snippet += this.indentText("/**\n")
-                + this.indentText(" * Constructor.\n")
-                + this.indentText(`${this.getConstructorParamDocblockText()}\n`)
-                + this.indentText(" */\n")
+            snippet += this.indentText(
+                "/**\n",
+                insertLineIndentation
+            );
+            snippet += this.indentText(
+                " * Constructor.\n",
+                insertLineIndentation
+            );
+            snippet += this.indentText(
+                `${this.getConstructorParamDocblockText()}\n`,
+                insertLineIndentation
+            );
+            snippet += this.indentText(
+                " */\n",
+                insertLineIndentation
+            );
         }
 
         const visibility = this.config('phpAddProperty.constructor.visibility.default');
         let constructorText = this.indentText(
             this.config('phpAddProperty.constructor.visibility.choose') === true
                 ? `\${${this.tabStops.constructorVisibility}${this.getVisibilityChoice(visibility)}} `
-                : `${visibility} `
-            );
+                : `${visibility} `,
+            insertLineIndentation
+        );
 
         const parameterText = this.getParameterText();
 
-        constructorText += `function __construct(${parameterText})\n`
-            + this.indentText('{\n')
-            + this.indentText(`\\$this->${this.name} = \\$${this.name};\$0\n`, 2)
-            + this.indentText('}');
+        constructorText += `function __construct(${parameterText})\n`;
+        constructorText += this.indentText('{\n', insertLineIndentation);
+        constructorText += this.indentText(
+            `\\$this->${this.name} = \\$${this.name};\$0\n`,
+            insertLineIndentation + 1
+        );
+        constructorText += this.indentText('}', insertLineIndentation);
 
         snippet += constructorText;
 
@@ -141,7 +168,7 @@ class AddProperty {
         for (let nextLineNumber = insertLine.range.end.line + 1; nextLineNumber < this.activeEditor().document.lineCount; nextLineNumber++) {
             const nextLine = this.activeEditor().document.lineAt(nextLineNumber);
             
-            if (!nextLine.isEmptyOrWhitespace) {
+            if (!this.isEmptyOrWhiteSpaceLine(nextLine)) {
                 if (!/}/.test(nextLine.text)) {
                     snippet += "\n";
                 }
@@ -310,6 +337,10 @@ class AddProperty {
     }
 
     indentText(text, level = 1) {
+        if (level < 1) {
+            level = 1;
+        }
+
         /**
          * Good to have
          * Listen for view options changes and use these values
@@ -430,6 +461,10 @@ class AddProperty {
         return /(public|protected|private|static)\s+\$\w+.*;/.test(textLine);
     }
 
+    isClassLine(textLine) {
+        return /(?:^(?:(?:final|abstract)\s+)?class\s+\w+)|(new\s+class)/.test(textLine);
+    }
+
     replaceWithSnippet(text, range) {
         const rangeLines = range.end.line - range.start.line;
 
@@ -481,6 +516,10 @@ class AddProperty {
         }
 
         return line.text.substr(i);
+    }
+
+    isEmptyOrWhiteSpaceLine(line) {
+        return /^[\s\t]*$/.test(line.text);
     }
 
     calculateIndentationLevel(index) {
@@ -556,11 +595,19 @@ class AddProperty {
     }
 
     parseDocument(document) {
-        for (let lineNumber = 0; lineNumber < document.lineCount; lineNumber++) {
+        let startingLine = 0;
+
+        const selection = this.activeEditor().selection.active;
+        
+        if (selection) {
+            startingLine = this.getClassLineNumberFromCursorLineNumber(document, selection.line); 
+        }
+
+        for (let lineNumber = startingLine; lineNumber < document.lineCount; lineNumber++) {
             const line = document.lineAt(lineNumber);
             const textLine = line.text;
             
-            if (/^(?:(?:final|abstract)\s+)?class\s+\w+/.test(this.getLineTextFromFirstNonIndentationCharacter(line))) {
+            if (this.isClassLine(this.getLineTextFromFirstNonIndentationCharacter(line))) {
                 this.classLine = line;
                 if (! /^{/.test(this.getLineTextFromFirstNonIndentationCharacter(line))) {
                     for (let nextLineNumber = lineNumber + 1; nextLineNumber < document.lineCount; nextLineNumber++) {
@@ -590,11 +637,11 @@ class AddProperty {
                 this.lastPropertyLine = line;
             }
 
-            const lineIsOpenBracketAfterClass = this.classLine
+            const lineIsBracketAfterClass = this.classLine
                 && this.classLine.lineNumber != line.lineNumber
-                && /^{/.test(this.getLineTextFromFirstNonIndentationCharacter(line));
+                && /^{|}/.test(this.getLineTextFromFirstNonIndentationCharacter(line));
 
-            if (lineIsOpenBracketAfterClass) {
+            if (lineIsBracketAfterClass) {
                 break;
             }
 
@@ -654,6 +701,18 @@ class AddProperty {
                 }
             } 
         }
+    }
+
+    getClassLineNumberFromCursorLineNumber(document, cursorLineNumber) {
+        for (let lineNumber = cursorLineNumber; lineNumber >= 0; lineNumber--) {
+            const line = document.lineAt(lineNumber);
+            
+            if (this.isClassLine(this.getLineTextFromFirstNonIndentationCharacter(line))) {
+                return lineNumber;
+            }
+        }
+
+        return 0;
     }
 }
 

@@ -51,6 +51,22 @@ suite('Add Property', function () {
         await runFixture('ClassKeyword.php');
     });
 
+    test('Should insert property in the first class if the file contains multiple', async () => {
+        await runFixture('MultipleClasses.php');
+    });
+    
+    test('Should insert property in the first class if the cursor is placed there', async () => {
+        await runFixture('MultipleClassesCursorInFirst.php', new vscode.Position(8, 0));
+    });
+
+    test('Should insert property in the last class if the cursor is placed there', async () => {
+        await runFixture('MultipleClassesCursorInLast.php', new vscode.Position(13, 0));
+    });
+
+    test('Should insert property in an anonymous class', async () => {
+        await runFixture('AnonymousClass.php', new vscode.Position(11, 0));
+    });
+    
     test('Should add a docblock with @param along with the constructor', async () => {
         await vscode.workspace.getConfiguration('phpAddProperty').update('constructor.docblock.enable', true, true);
         await runFixture('AddConstructorDocblock.php');
@@ -62,7 +78,7 @@ suite('Add Property', function () {
     });
 });
 
-async function runFixture(fileName) {
+async function runFixture(fileName, cursorPosition) {
     vscode.window.showInputBox = function () {
         return 'name';
     };
@@ -72,6 +88,10 @@ async function runFixture(fileName) {
     );
     const document = await vscode.workspace.openTextDocument(uri);
     await vscode.window.showTextDocument(document);
+
+    if (cursorPosition) {
+        vscode.window.activeTextEditor.selections = [new vscode.Selection(cursorPosition, cursorPosition)];
+    }
 
     await vscode.commands.executeCommand('phpAddProperty.add');
 
