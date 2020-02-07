@@ -462,7 +462,7 @@ class AddProperty {
     }
 
     isClassLine(textLine) {
-        return /^(?:(?:final|abstract)\s+)?class\s+\w+/.test(textLine);
+        return /(?:^(?:(?:final|abstract)\s+)?class\s+\w+)|(new\s+class)/.test(textLine);
     }
 
     replaceWithSnippet(text, range) {

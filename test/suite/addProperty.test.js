@@ -62,6 +62,10 @@ suite('Add Property', function () {
     test('Should insert property in the last class if the cursor is placed there', async () => {
         await runFixture('MultipleClassesCursorInLast.php', new vscode.Position(13, 0));
     });
+
+    test('Should insert property in an anonymous class', async () => {
+        await runFixture('AnonymousClass.php', new vscode.Position(11, 0));
+    });
     
     test('Should add a docblock with @param along with the constructor', async () => {
         await vscode.workspace.getConfiguration('phpAddProperty').update('constructor.docblock.enable', true, true);
