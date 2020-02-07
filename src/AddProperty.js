@@ -430,6 +430,10 @@ class AddProperty {
         return /(public|protected|private|static)\s+\$\w+.*;/.test(textLine);
     }
 
+    isClassLine(textLine) {
+        return /^(?:(?:final|abstract)\s+)?class\s+\w+/.test(textLine);
+    }
+
     replaceWithSnippet(text, range) {
         const rangeLines = range.end.line - range.start.line;
 
@@ -556,11 +560,19 @@ class AddProperty {
     }
 
     parseDocument(document) {
-        for (let lineNumber = 0; lineNumber < document.lineCount; lineNumber++) {
+        let startingLine = 0;
+
+        const selection = this.activeEditor().selection.active;
+        
+        if (selection) {
+            startingLine = this.getClassLineNumberFromCursorLineNumber(document, selection.line); 
+        }
+
+        for (let lineNumber = startingLine; lineNumber < document.lineCount; lineNumber++) {
             const line = document.lineAt(lineNumber);
             const textLine = line.text;
             
-            if (/^(?:(?:final|abstract)\s+)?class\s+\w+/.test(this.getLineTextFromFirstNonIndentationCharacter(line))) {
+            if (this.isClassLine(this.getLineTextFromFirstNonIndentationCharacter(line))) {
                 this.classLine = line;
                 if (! /^{/.test(this.getLineTextFromFirstNonIndentationCharacter(line))) {
                     for (let nextLineNumber = lineNumber + 1; nextLineNumber < document.lineCount; nextLineNumber++) {
@@ -654,6 +666,18 @@ class AddProperty {
                 }
             } 
         }
+    }
+
+    getClassLineNumberFromCursorLineNumber(document, cursorLineNumber) {
+        for (let lineNumber = cursorLineNumber; lineNumber >= 0; lineNumber--) {
+            const line = document.lineAt(lineNumber);
+            
+            if (this.isClassLine(this.getLineTextFromFirstNonIndentationCharacter(line))) {
+                return lineNumber;
+            }
+        }
+
+        return 0;
     }
 }
 
