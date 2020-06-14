@@ -104,7 +104,7 @@ export function removeProperty(editor: vscode.TextEditor, property: Property, ph
 		}
 	}
 
-	if (newDocumentText === document.getText()) {
+	if (newDocumentText === document.getText(phpClassRange)) {
 		return;
 	}
 

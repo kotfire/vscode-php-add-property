@@ -69,7 +69,7 @@ function removeProperty(editor, property, phpClass) {
             }
         }
     }
-    if (newDocumentText === document.getText()) {
+    if (newDocumentText === document.getText(phpClassRange)) {
         return;
     }
     (_f = vscode.window.activeTextEditor) === null || _f === void 0 ? void 0 : _f.edit(editBuilder => {

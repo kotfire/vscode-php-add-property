@@ -4,6 +4,7 @@ import Locator from './locator';
 import Property from './property';
 import insertProperty from './insertProperty';
 import { removeProperty } from './removeProperty';
+import { forceBreakConstructorIntoMultiline } from './utils';
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
@@ -229,6 +230,68 @@ export function activate(context: vscode.ExtensionContext) {
 			const property = new Property(propertyName);
 
 			removeProperty(vscode.window.activeTextEditor, property, phpClass);
+		}),
+		vscode.commands.registerCommand('phpAddProperty.breakConstructorIntoMultiline', async () => {
+			if (vscode.window.activeTextEditor === undefined) {
+				return;
+			}
+
+			const document = vscode.window.activeTextEditor.document;
+
+			const phpEngine = new PhpEngine({
+				ast: {
+					withPositions: false,
+					withSource: true,
+				},
+				lexer: {
+					debug: false,
+					all_tokens: true,
+					comment_tokens: true,
+					mode_eval: false,
+					asp_tags: false,
+					short_tags: true,
+				},
+				parser: {
+					debug: false,
+					extractDoc: true,
+					suppressErrors: true
+				},
+			});
+
+			const ast = phpEngine.parseCode(document.getText());
+
+			const locator = new Locator(ast);
+
+			const selectionLineNumber = vscode.window.activeTextEditor.selection.active.line;
+
+			const phpClass = locator.findClass(selectionLineNumber + 1);
+
+			if (!phpClass) {
+				vscode.window.showInformationMessage('No class found');
+
+				return;
+			}
+
+			const phpClassRange = new vscode.Range(
+				new vscode.Position(phpClass.ast.loc.start.line - 1, phpClass.ast.loc.start.column),
+				new vscode.Position(phpClass.ast.loc.end.line - 1, phpClass.ast.loc.end.column)
+			);
+
+			const newDocumentText = forceBreakConstructorIntoMultiline(document.getText(phpClassRange));
+
+			if (newDocumentText === document.getText(phpClassRange)) {
+				return;
+			}
+
+			vscode.window.activeTextEditor?.edit(
+				editBuilder => {
+					editBuilder.replace(phpClassRange, newDocumentText);
+				},
+				{
+					undoStopBefore: true,
+					undoStopAfter: false
+				}
+			);
 		})
 	);
 }

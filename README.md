@@ -57,3 +57,4 @@ This extension contributes the following settings:
 * `phpAddProperty.contextMenuOptions.addProperty`: Specifies whether to show the add property command in the context menu options
 * `phpAddProperty.contextMenuOptions.appendProperty`: Specifies whether to show the append property command in the context menu options
 * `phpAddProperty.contextMenuOptions.removeProperty`: Specifies whether to show the remove property command in the context menu options
+* `phpAddProperty.contextMenuOptions.breakConstructorIntoMultiline`: Specifies whether to show the break constructor into multiline command in the context menu options

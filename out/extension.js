@@ -15,6 +15,7 @@ const locator_1 = require("./locator");
 const property_1 = require("./property");
 const insertProperty_1 = require("./insertProperty");
 const removeProperty_1 = require("./removeProperty");
+const utils_1 = require("./utils");
 function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('phpAddProperty.add', () => __awaiter(this, void 0, void 0, function* () {
         if (vscode.window.activeTextEditor === undefined) {
@@ -183,6 +184,50 @@ function activate(context) {
         }
         const property = new property_1.default(propertyName);
         removeProperty_1.removeProperty(vscode.window.activeTextEditor, property, phpClass);
+    })), vscode.commands.registerCommand('phpAddProperty.breakConstructorIntoMultiline', () => __awaiter(this, void 0, void 0, function* () {
+        var _w;
+        if (vscode.window.activeTextEditor === undefined) {
+            return;
+        }
+        const document = vscode.window.activeTextEditor.document;
+        const phpEngine = new php_parser_1.default({
+            ast: {
+                withPositions: false,
+                withSource: true,
+            },
+            lexer: {
+                debug: false,
+                all_tokens: true,
+                comment_tokens: true,
+                mode_eval: false,
+                asp_tags: false,
+                short_tags: true,
+            },
+            parser: {
+                debug: false,
+                extractDoc: true,
+                suppressErrors: true
+            },
+        });
+        const ast = phpEngine.parseCode(document.getText());
+        const locator = new locator_1.default(ast);
+        const selectionLineNumber = vscode.window.activeTextEditor.selection.active.line;
+        const phpClass = locator.findClass(selectionLineNumber + 1);
+        if (!phpClass) {
+            vscode.window.showInformationMessage('No class found');
+            return;
+        }
+        const phpClassRange = new vscode.Range(new vscode.Position(phpClass.ast.loc.start.line - 1, phpClass.ast.loc.start.column), new vscode.Position(phpClass.ast.loc.end.line - 1, phpClass.ast.loc.end.column));
+        const newDocumentText = utils_1.forceBreakConstructorIntoMultiline(document.getText(phpClassRange));
+        if (newDocumentText === document.getText(phpClassRange)) {
+            return;
+        }
+        (_w = vscode.window.activeTextEditor) === null || _w === void 0 ? void 0 : _w.edit(editBuilder => {
+            editBuilder.replace(phpClassRange, newDocumentText);
+        }, {
+            undoStopBefore: true,
+            undoStopAfter: false
+        });
     })));
 }
 exports.activate = activate;

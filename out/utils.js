@@ -9,28 +9,43 @@ function getVisibilityChoice(defaultValue) {
     return `|${[defaultValue, ...visibilityChoices].join(',')}|`;
 }
 exports.getVisibilityChoice = getVisibilityChoice;
+function extractConstructorParts(text) {
+    const regex = /(.*__construct\s*)\(((?:\s|\S)*?)(?=\))\s*\)\s*{/;
+    const match = regex.exec(text);
+    return match;
+}
+function getMultilineConstructorText(text, functionDefinition, parametersText) {
+    const parameters = parametersText.split(',').map(parameter => indentText(parameter.trim(), 2));
+    const multilineConstructorText = functionDefinition
+        + '(\n'
+        + `${parameters.join(',\n')}\n`
+        + indentText(') {');
+    return text.replace(text, multilineConstructorText);
+}
 function breakConstructorIntoMultiline(text) {
     if (config('phpAddProperty.constructor.breakIntoMultilineIfLengthExceeded.enabled') !== true) {
         return text;
     }
-    const regex = /(.*__construct\s*)\(((?:\s|\S)*?)(?=\))\s*\)\s*{/;
-    const match = regex.exec(text);
-    if (match) {
-        const constructorLineText = match[0];
-        const maxLineLength = config('phpAddProperty.constructor.breakIntoMultilineIfLengthExceeded.maxLineLength');
-        if (constructorLineText.length > maxLineLength) {
-            const parametersText = match[2];
-            const parameters = parametersText.split(',').map(parameter => indentText(parameter.trim(), 2));
-            const multilineConstructorText = match[1]
-                + '(\n'
-                + `${parameters.join(',\n')}\n`
-                + indentText(') {');
-            text = text.replace(match[0], multilineConstructorText);
-        }
+    const match = extractConstructorParts(text);
+    if (!match) {
+        return text;
     }
-    return text;
+    const constructorLineText = match[0];
+    const maxLineLength = config('phpAddProperty.constructor.breakIntoMultilineIfLengthExceeded.maxLineLength');
+    if (constructorLineText.length <= maxLineLength) {
+        return text;
+    }
+    return text.replace(constructorLineText, getMultilineConstructorText(constructorLineText, match[1], match[2]));
 }
 exports.breakConstructorIntoMultiline = breakConstructorIntoMultiline;
+function forceBreakConstructorIntoMultiline(text) {
+    const match = extractConstructorParts(text);
+    if (!match) {
+        return text;
+    }
+    return text.replace(match[0], getMultilineConstructorText(match[0], match[1], match[2]));
+}
+exports.forceBreakConstructorIntoMultiline = forceBreakConstructorIntoMultiline;
 function calculateIndentationLevel(index) {
     return Math.floor(index / configUsingResource('editor.tabSize'));
 }

@@ -24,7 +24,8 @@
 		"onLanguage:php",
 		"onCommand:phpAddProperty.add",
 		"onCommand:phpAddProperty.append",
-		"onCommand:phpAddProperty.remove"
+		"onCommand:phpAddProperty.remove",
+		"onCommand:phpAddProperty.breakConstructorIntoMultiline"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -40,6 +41,10 @@
 			{
 				"command": "phpAddProperty.remove",
 				"title": "Remove Existing PHP Property"
+			},
+			{
+				"command": "phpAddProperty.breakConstructorIntoMultiline",
+				"title": "Break Constructor Into Multiline"
 			}
 		],
 		"menus": {
@@ -79,6 +84,12 @@
 					"command": "phpAddProperty.remove",
 					"alt": "phpAddProperty.remove",
 					"group": "0_phpAddProperty@3"
+				},
+				{
+					"when": "resourceLangId == php && config.phpAddProperty.contextMenuOptions.enable && config.phpAddProperty.contextMenuOptions.breakConstructorIntoMultiline",
+					"command": "phpAddProperty.breakConstructorIntoMultiline",
+					"alt": "phpAddProperty.breakConstructorIntoMultiline",
+					"group": "0_phpAddProperty@4"
 				}
 			]
 		},
@@ -200,6 +211,11 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Specifies whether to show the remove property command in the context menu options"
+				},
+				"phpAddProperty.contextMenuOptions.breakConstructorIntoMultiline": {
+					"type": "boolean",
+					"default": true,
+					"description": "Specifies whether to show the break constructor into multiline command in the context menu options"
 				}
 			}
 		}
