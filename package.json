@@ -10,14 +10,17 @@
 	},
 	"categories": [
 		"Programming Languages",
-		"Snippets"
+		"Snippets",
+		"Formatters"
 	],
 	"keywords": [
 		"php",
 		"autocompletion",
-		"help",
+		"refactor",
 		"constructor",
-		"property"
+		"property",
+		"class",
+		"help"
 	],
 	"icon": "images/icon.png",
 	"activationEvents": [
