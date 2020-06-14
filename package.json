@@ -45,25 +45,37 @@
 		"menus": {
 			"commandPalette": [
 				{
+					"command": "phpAddProperty.add",
+					"when": "editorLangId == php"
+				},
+				{
 					"command": "phpAddProperty.append",
+					"when": "editorLangId == php"
+				},
+				{
+					"command": "phpAddProperty.remove",
+					"when": "editorLangId == php"
+				},
+				{
+					"command": "phpAddProperty.breakConstructorIntoMultiline",
 					"when": "editorLangId == php"
 				}
 			],
 			"editor/context": [
 				{
-					"when": "resourceLangId == php && config.phpAddProperty.showContextMenuOptions",
+					"when": "resourceLangId == php && config.phpAddProperty.contextMenuOptions.enable && config.phpAddProperty.contextMenuOptions.addProperty",
 					"command": "phpAddProperty.add",
 					"alt": "phpAddProperty.add",
 					"group": "0_phpAddProperty@1"
 				},
 				{
-					"when": "resourceLangId == php && config.phpAddProperty.showContextMenuOptions",
+					"when": "resourceLangId == php && config.phpAddProperty.contextMenuOptions.enable && config.phpAddProperty.contextMenuOptions.appendProperty",
 					"command": "phpAddProperty.append",
 					"alt": "phpAddProperty.append",
 					"group": "0_phpAddProperty@2"
 				},
 				{
-					"when": "resourceLangId == php && config.phpAddProperty.showContextMenuOptions",
+					"when": "resourceLangId == php && config.phpAddProperty.contextMenuOptions.enable && config.phpAddProperty.contextMenuOptions.removeProperty",
 					"command": "phpAddProperty.remove",
 					"alt": "phpAddProperty.remove",
 					"group": "0_phpAddProperty@3"
@@ -169,10 +181,25 @@
 					"default": false,
 					"description": "Specifies whether to show messages on status bar instead of notification box"
 				},
-				"phpAddProperty.showContextMenuOptions": {
+				"phpAddProperty.contextMenuOptions.enable": {
 					"type": "boolean",
 					"default": false,
 					"description": "Specifies whether to show the context menu options"
+				},
+				"phpAddProperty.contextMenuOptions.addProperty": {
+					"type": "boolean",
+					"default": true,
+					"description": "Specifies whether to show the add property command in the context menu options"
+				},
+				"phpAddProperty.contextMenuOptions.appendProperty": {
+					"type": "boolean",
+					"default": true,
+					"description": "Specifies whether to show the append property command in the context menu options"
+				},
+				"phpAddProperty.contextMenuOptions.removeProperty": {
+					"type": "boolean",
+					"default": true,
+					"description": "Specifies whether to show the remove property command in the context menu options"
 				}
 			}
 		}
