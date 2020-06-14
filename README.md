@@ -4,7 +4,7 @@
 
 # PHP Add Property
 
-Visual Code Studio extension to quickly add PHP class properties
+Visual Code Studio extension to manage PHP class properties
 
 ## Features
 
