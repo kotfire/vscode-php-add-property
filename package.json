@@ -23,7 +23,8 @@
 	"activationEvents": [
 		"onLanguage:php",
 		"onCommand:phpAddProperty.add",
-		"onCommand:phpAddProperty.append"
+		"onCommand:phpAddProperty.append",
+		"onCommand:phpAddProperty.remove"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -35,6 +36,10 @@
 			{
 				"command": "phpAddProperty.append",
 				"title": "Add Existing PHP Property"
+			},
+			{
+				"command": "phpAddProperty.remove",
+				"title": "Remove Existing PHP Property"
 			}
 		],
 		"menus": {
@@ -56,6 +61,12 @@
 					"command": "phpAddProperty.append",
 					"alt": "phpAddProperty.append",
 					"group": "0_phpAddProperty@2"
+				},
+				{
+					"when": "resourceLangId == php && config.phpAddProperty.showContextMenuOptions",
+					"command": "phpAddProperty.remove",
+					"alt": "phpAddProperty.remove",
+					"group": "0_phpAddProperty@3"
 				}
 			]
 		},

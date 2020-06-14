@@ -146,6 +146,88 @@ export function activate(context: vscode.ExtensionContext) {
 			const property = new Property(propertyName, propertyAst.type?.name ?? docblockType);
 
 			insertProperty(vscode.window.activeTextEditor, property, phpClass, line.text);
+		}),
+		vscode.commands.registerCommand('phpAddProperty.remove', async () => {
+			if (vscode.window.activeTextEditor === undefined) {
+				return;
+			}
+
+			const document = vscode.window.activeTextEditor.document;
+
+			const phpEngine = new PhpEngine({
+				ast: {
+					withPositions: false,
+					withSource: true,
+				},
+				lexer: {
+					debug: false,
+					all_tokens: true,
+					comment_tokens: true,
+					mode_eval: false,
+					asp_tags: false,
+					short_tags: true,
+				},
+				parser: {
+					debug: false,
+					extractDoc: true,
+					suppressErrors: true
+				},
+			});
+
+			const ast = phpEngine.parseCode(document.getText());
+
+			const locator = new Locator(ast);
+
+			const selectionLineNumber = vscode.window.activeTextEditor.selection.active.line;
+
+			const phpClass = locator.findClass(selectionLineNumber);
+
+			if (!phpClass) {
+				vscode.window.showInformationMessage('No class found');
+
+				return;
+			}
+
+			const line = document.lineAt(selectionLineNumber);
+
+			const lineAst = (phpEngine.parseEval(`class A { ${line.text} }`) as any);
+
+			const selectedWord = document.getText(document.getWordRangeAtPosition(vscode.window.activeTextEditor.selection.active)).replace(/^\$/, '');
+
+			let propertyName;
+			if (lineAst.children[0]?.body[0]?.kind === 'propertystatement') {
+				const properties = (lineAst.children[0].body[0].properties as any[]);
+
+				const propertyAst = properties.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? properties[0];
+				propertyName = propertyAst.name?.name;
+
+				if (propertyName === 'this') {
+					const assignmentAst = (phpEngine.parseEval(`class A { public function __construct() { ${line.text} } }`) as any);
+
+					if (assignmentAst.children[0]?.body[0]?.body?.children[0]?.kind === 'expressionstatement') {
+						propertyName = assignmentAst.children[0].body[0].body.children[0].expression.right?.name;
+					}
+				}
+			} else if (lineAst.children[0]?.body[0]?.kind === 'method') {
+				const constructorArgs = (lineAst.children[0].body[0].arguments as any[]);
+
+				const argumentAst = constructorArgs.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? constructorArgs[0];
+				propertyName = argumentAst.name?.name;
+			}
+
+			if (!propertyName) {
+				propertyName = await vscode.window.showInputBox({
+					placeHolder: 'Enter the property name you want to remove'
+				});
+			}
+
+			if (propertyName === undefined || propertyName.trim() === "") {
+				return;
+			}
+
+			const property = new Property(propertyName);
+
+			removeProperty(vscode.window.activeTextEditor, property, phpClass);
 		})
 	);
 }
@@ -669,3 +751,120 @@ function insertProperty(editor: vscode.TextEditor, property: Property, phpClass:
 
 	replaceWithSnippet(newDocumentText, phpClassRange);
 }
+
+function removeProperty(editor: vscode.TextEditor, property: Property, phpClass: PhpClass) {
+	const document = editor.document;
+	const phpClassRange = new vscode.Range(
+		new vscode.Position(phpClass.ast.loc.start.line - 1, phpClass.ast.loc.start.column),
+		new vscode.Position(phpClass.ast.loc.end.line - 1, phpClass.ast.loc.end.column)
+	);
+
+	let newDocumentText = document.getText(phpClassRange);
+
+	const astClassBody = phpClass.ast.body;
+	for (let i = 0; i < astClassBody.length; i++) {
+		const node = astClassBody[i];
+
+		if (node.kind === 'propertystatement') {
+			for (let j = 0; j < node.properties.length; j++) {
+				const propertyNode = node.properties[j];
+
+				if (propertyNode.name?.name === property.getName()) {
+					if (node.properties.length === 1) {
+						const nextNotEmptyLine = i + 1 < astClassBody.length
+							? astClassBody[i + 1].loc.start.line - 1
+							: node.loc.end.line;
+						const propertyStatementRange = new vscode.Range(
+							new vscode.Position(node.loc.start.line - 1, 0),
+							new vscode.Position(nextNotEmptyLine, 0)
+						);
+
+						const propertyStatementText = document.getText(propertyStatementRange);
+
+						newDocumentText = newDocumentText.replace(propertyStatementText, '');
+					} else {
+						const regexp = new RegExp(`(,\\s*(?!.*,))?${escapeForRegExp(propertyNode.loc.source)}(\\s*,\\s*)?`);
+						newDocumentText = newDocumentText.replace(regexp, '');
+					}
+
+					for (let i = 0; i < node.leadingComments?.length; i++) {
+						const commentNode = node.leadingComments[i];
+		
+						const commentRange = new vscode.Range(
+							new vscode.Position(commentNode.loc.start.line - 1, 0),
+							new vscode.Position(commentNode.loc.end.line, 0)
+						);
+
+						const commentText = document.getText(commentRange);
+
+						newDocumentText = newDocumentText.replace(commentText, '');
+					}
+
+					break;
+				}
+			}
+		}
+	}
+
+	const constructor = phpClass.getConstructor();
+
+	if (constructor) {
+		if (constructor.ast.body?.children.length <= 1) {
+			const constructorRange = new vscode.Range(
+				new vscode.Position(constructor.ast.loc.start.line - 1, 0),
+				new vscode.Position(constructor.ast.loc.end.line, 0)
+			);
+
+			const constructorText = document.getText(constructorRange);
+
+			newDocumentText = newDocumentText.replace(constructorText, '');
+		} else {
+			for (let i = 0; i < constructor.ast.arguments.length; i++) {
+				const node = constructor.ast.arguments[i];
+
+				if (node.name?.name == property.getName()) {
+					const constructorText = constructor.ast.loc.source;
+					const regexp = new RegExp(`(,\\s*(?!.*,))?${escapeForRegExp(node.loc.source)}(\\s*,\\s*)?`);
+					const newConstructorText = constructorText.replace(regexp, '');
+					newDocumentText = newDocumentText.replace(constructorText, newConstructorText);
+					break;
+				}
+			}
+
+			for (let i = 0; i < constructor.ast.body?.children.length; i++) {
+				const node = constructor.ast.body.children[i];
+
+				if (node.kind === 'expressionstatement'
+					&& node.expression.kind === 'assign'
+					&& node.expression.left.kind === 'propertylookup'
+					&& node.expression.left.offset.name === property.getName()
+				) {
+					const propertyAssignmentRange = new vscode.Range(
+						new vscode.Position(node.loc.start.line - 1, 0),
+						new vscode.Position(node.loc.end.line, 0)
+					);
+
+					const propertyAssignmentText = document.getText(propertyAssignmentRange);
+
+					newDocumentText = newDocumentText.replace(propertyAssignmentText, '');
+					break;
+				}
+			}
+		}
+	}
+
+	if (newDocumentText === document.getText()) {
+		return;
+	}
+
+	vscode.window.activeTextEditor?.edit(
+		editBuilder => {
+			editBuilder.replace(phpClassRange, newDocumentText);
+		},
+		{
+			undoStopBefore: true,
+			undoStopAfter: false
+		}
+	);
+}
+
