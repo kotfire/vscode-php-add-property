@@ -6,7 +6,7 @@
 	"license": "SEE LICENSE IN LICENSE",
 	"version": "0.5.0",
 	"engines": {
-		"vscode": "^1.38.0"
+		"vscode": "^1.31.0"
 	},
 	"categories": [
 		"Programming Languages",

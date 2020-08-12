@@ -21,6 +21,17 @@ function main() {
             // Passed to --extensionTestsPath
             const extensionTestsPath = path.resolve(__dirname, './suite/index');
             const testUserDir = path.resolve(__dirname, './user');
+            const vscodeCompatibilityString = require('../../package.json').engines.vscode;
+            const vscodeMinimumVersion = vscodeCompatibilityString.replace(/[^\d\.]/g, '');
+            yield vscode_test_1.runTests({
+                version: vscodeMinimumVersion,
+                extensionDevelopmentPath,
+                extensionTestsPath,
+                launchArgs: [
+                    `--user-data-dir=${testUserDir}`,
+                    '--disable-extensions'
+                ]
+            });
             yield vscode_test_1.runTests({
                 extensionDevelopmentPath,
                 extensionTestsPath,

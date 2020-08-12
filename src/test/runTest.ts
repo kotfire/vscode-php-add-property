@@ -14,6 +14,21 @@ async function main() {
 
 		const testUserDir = path.resolve(__dirname, './user');
 
+		const vscodeCompatibilityString = require('../../package.json').engines.vscode;
+		const vscodeMinimumVersion = vscodeCompatibilityString.replace(/[^\d\.]/g, '');
+
+		await runTests(
+			{
+				version: vscodeMinimumVersion,
+				extensionDevelopmentPath,
+				extensionTestsPath,
+				launchArgs: [
+					`--user-data-dir=${testUserDir}`,
+					'--disable-extensions'
+				]
+			}
+		);
+
 		await runTests(
 			{
 				extensionDevelopmentPath,
