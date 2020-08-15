@@ -1,7 +1,7 @@
 {
 	"name": "php-add-property",
 	"displayName": "PHP Add Property",
-	"description": "Quick way to manage PHP class properties",
+	"description": "Manage PHP class properties",
 	"publisher": "kotfire",
 	"license": "SEE LICENSE IN LICENSE",
 	"version": "0.5.0",
