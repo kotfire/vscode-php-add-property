@@ -5,6 +5,7 @@ import Property from './property';
 import insertProperty from './insertProperty';
 import { removeProperty } from './removeProperty';
 import { forceBreakConstructorIntoMultiline } from './utils';
+import { renameProperty } from './renameProperty';
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
@@ -148,6 +149,98 @@ export function activate(context: vscode.ExtensionContext) {
 			const property = new Property(propertyName, propertyAst.type?.name ?? docblockType);
 
 			insertProperty(vscode.window.activeTextEditor, property, phpClass, line.text);
+		}),
+		vscode.commands.registerCommand('phpAddProperty.rename', async () => {
+			if (vscode.window.activeTextEditor === undefined) {
+				return;
+			}
+
+			const document = vscode.window.activeTextEditor.document;
+
+			const phpEngine = new PhpEngine({
+				ast: {
+					withPositions: false,
+					withSource: true,
+				},
+				lexer: {
+					debug: false,
+					all_tokens: true,
+					comment_tokens: true,
+					mode_eval: false,
+					asp_tags: false,
+					short_tags: true,
+				},
+				parser: {
+					debug: false,
+					extractDoc: true,
+					suppressErrors: true
+				},
+			});
+
+			const ast = phpEngine.parseCode(document.getText());
+
+			const locator = new Locator(ast);
+
+			const selectionLineNumber = vscode.window.activeTextEditor.selection.active.line;
+
+			const phpClass = locator.findClass(selectionLineNumber);
+
+			if (!phpClass) {
+				vscode.window.showInformationMessage('No class found');
+
+				return;
+			}
+
+			const line = document.lineAt(selectionLineNumber);
+
+			const lineAst = (phpEngine.parseEval(`class A { ${line.text} }`) as any);
+
+			const selectedWord = document.getText(document.getWordRangeAtPosition(vscode.window.activeTextEditor.selection.active)).replace(/^\$/, '');
+
+			let propertyName;
+			if (lineAst.children[0]?.body[0]?.kind === 'propertystatement') {
+				const properties = (lineAst.children[0].body[0].properties as any[]);
+
+				const propertyAst = properties.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? properties[0];
+				propertyName = propertyAst.name?.name;
+
+				if (propertyName === 'this') {
+					const assignmentAst = (phpEngine.parseEval(`class A { public function __construct() { ${line.text} } }`) as any);
+
+					if (assignmentAst.children[0]?.body[0]?.body?.children[0]?.kind === 'expressionstatement') {
+						propertyName = assignmentAst.children[0].body[0].body.children[0].expression.right?.name;
+					}
+				}
+			} else if (lineAst.children[0]?.body[0]?.kind === 'method') {
+				const constructorArgs = (lineAst.children[0].body[0].arguments as any[]);
+
+				const argumentAst = constructorArgs.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? constructorArgs[0];
+				propertyName = argumentAst.name?.name;
+			}
+
+			if (!propertyName) {
+				propertyName = await vscode.window.showInputBox({
+					placeHolder: 'Enter the property name you want to rename'
+				});
+			}
+
+			if (propertyName === undefined || propertyName.trim() === "") {
+				return;
+			}
+
+			const property = new Property(propertyName);
+
+			const newPropertyName = await vscode.window.showInputBox({
+				placeHolder: 'Enter the new property name'
+			});
+
+			if (newPropertyName === undefined || newPropertyName.trim() === "") {
+				return;
+			}
+
+			const newProperty = new Property(newPropertyName);
+
+			renameProperty(vscode.window.activeTextEditor, property, newProperty, phpClass);
 		}),
 		vscode.commands.registerCommand('phpAddProperty.remove', async () => {
 			if (vscode.window.activeTextEditor === undefined) {

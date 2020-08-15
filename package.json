@@ -27,6 +27,7 @@
 		"onLanguage:php",
 		"onCommand:phpAddProperty.add",
 		"onCommand:phpAddProperty.append",
+		"onCommand:phpAddProperty.rename",
 		"onCommand:phpAddProperty.remove",
 		"onCommand:phpAddProperty.breakConstructorIntoMultiline"
 	],
@@ -40,6 +41,10 @@
 			{
 				"command": "phpAddProperty.append",
 				"title": "Add Existing PHP Property"
+			},
+			{
+				"command": "phpAddProperty.rename",
+				"title": "Rename PHP Property"
 			},
 			{
 				"command": "phpAddProperty.remove",
@@ -58,6 +63,10 @@
 				},
 				{
 					"command": "phpAddProperty.append",
+					"when": "editorLangId == php"
+				},
+				{
+					"command": "phpAddProperty.rename",
 					"when": "editorLangId == php"
 				},
 				{
@@ -83,16 +92,22 @@
 					"group": "0_phpAddProperty@2"
 				},
 				{
+					"when": "resourceLangId == php && config.phpAddProperty.contextMenuOptions.enable && config.phpAddProperty.contextMenuOptions.renameProperty",
+					"command": "phpAddProperty.rename",
+					"alt": "phpAddProperty.rename",
+					"group": "0_phpAddProperty@3"
+				},
+				{
 					"when": "resourceLangId == php && config.phpAddProperty.contextMenuOptions.enable && config.phpAddProperty.contextMenuOptions.removeProperty",
 					"command": "phpAddProperty.remove",
 					"alt": "phpAddProperty.remove",
-					"group": "0_phpAddProperty@3"
+					"group": "0_phpAddProperty@4"
 				},
 				{
 					"when": "resourceLangId == php && config.phpAddProperty.contextMenuOptions.enable && config.phpAddProperty.contextMenuOptions.breakConstructorIntoMultiline",
 					"command": "phpAddProperty.breakConstructorIntoMultiline",
 					"alt": "phpAddProperty.breakConstructorIntoMultiline",
-					"group": "0_phpAddProperty@4"
+					"group": "0_phpAddProperty@5"
 				}
 			]
 		},
@@ -209,6 +224,11 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Specifies whether to show the append property command in the context menu options"
+				},
+				"phpAddProperty.contextMenuOptions.renameProperty": {
+					"type": "boolean",
+					"default": true,
+					"description": "Specifies whether to show the rename property command in the context menu options"
 				},
 				"phpAddProperty.contextMenuOptions.removeProperty": {
 					"type": "boolean",
