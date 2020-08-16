@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = require("vscode");
 const utils_1 = require("./utils");
 function removeProperty(editor, property, phpClass) {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e, _f, _g;
     const document = editor.document;
     const phpClassRange = new vscode.Range(new vscode.Position(phpClass.ast.loc.start.line - 1, phpClass.ast.loc.start.column), new vscode.Position(phpClass.ast.loc.end.line - 1, phpClass.ast.loc.end.column));
     let newDocumentText = document.getText(phpClassRange);
@@ -40,14 +40,17 @@ function removeProperty(editor, property, phpClass) {
     const constructor = phpClass.getConstructor();
     if (constructor) {
         if (((_c = constructor.ast.body) === null || _c === void 0 ? void 0 : _c.children.length) <= 1) {
-            const constructorRange = new vscode.Range(new vscode.Position(constructor.ast.loc.start.line - 1, 0), new vscode.Position(constructor.ast.loc.end.line, 0));
-            const constructorText = document.getText(constructorRange);
-            newDocumentText = newDocumentText.replace(constructorText, '');
+            const node = constructor.ast.arguments[0];
+            if (constructor.ast.body.children.length == 0 || ((_d = node.name) === null || _d === void 0 ? void 0 : _d.name) == property.getName()) {
+                const constructorRange = new vscode.Range(new vscode.Position(constructor.ast.loc.start.line - 1, 0), new vscode.Position(constructor.ast.loc.end.line, 0));
+                const constructorText = document.getText(constructorRange);
+                newDocumentText = newDocumentText.replace(constructorText, '');
+            }
         }
         else {
             for (let i = 0; i < constructor.ast.arguments.length; i++) {
                 const node = constructor.ast.arguments[i];
-                if (((_d = node.name) === null || _d === void 0 ? void 0 : _d.name) == property.getName()) {
+                if (((_e = node.name) === null || _e === void 0 ? void 0 : _e.name) == property.getName()) {
                     const constructorText = constructor.ast.loc.source;
                     const regexp = new RegExp(`(,\\s*(?!.*,))?${utils_1.escapeForRegExp(node.loc.source)}(\\s*,\\s*)?`);
                     const newConstructorText = constructorText.replace(regexp, '');
@@ -55,7 +58,7 @@ function removeProperty(editor, property, phpClass) {
                     break;
                 }
             }
-            for (let i = 0; i < ((_e = constructor.ast.body) === null || _e === void 0 ? void 0 : _e.children.length); i++) {
+            for (let i = 0; i < ((_f = constructor.ast.body) === null || _f === void 0 ? void 0 : _f.children.length); i++) {
                 const node = constructor.ast.body.children[i];
                 if (node.kind === 'expressionstatement'
                     && node.expression.kind === 'assign'
@@ -72,7 +75,7 @@ function removeProperty(editor, property, phpClass) {
     if (newDocumentText === document.getText(phpClassRange)) {
         return;
     }
-    (_f = vscode.window.activeTextEditor) === null || _f === void 0 ? void 0 : _f.edit(editBuilder => {
+    (_g = vscode.window.activeTextEditor) === null || _g === void 0 ? void 0 : _g.edit(editBuilder => {
         editBuilder.replace(phpClassRange, newDocumentText);
     }, {
         undoStopBefore: true,

@@ -19,12 +19,20 @@ suite('Remove Property', function () {
         await runFixture('ConstructorWithMultipleProperties.php');
     });
 
+    test('Should remove the constructor method when the body is empty', async () => {
+        await runFixture('EmptyConstructor.php');
+    });
+
     test('Should remove the constructor method when the body is empty after removing the last property', async () => {
         await runFixture('ConstructorWithSingleProperty.php');
     });
 
     test('Should NOT remove the constructor method when the body is NOT empty after removing the last property', async () => {
         await runFixture('ConstructorWithOneProperty.php');
+    });
+    
+    test('Should NOT remove the constructor argument when the property name does not match', async () => {
+        await runFixture('ConstructorWithOtherArgument.php');
     });
 
     test('Should remove typed properties', async () => {

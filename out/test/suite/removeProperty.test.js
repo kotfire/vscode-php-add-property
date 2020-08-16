@@ -25,11 +25,17 @@ suite('Remove Property', function () {
     test('Should remove an existing property by name', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('ConstructorWithMultipleProperties.php');
     }));
+    test('Should remove the constructor method when the body is empty', () => __awaiter(this, void 0, void 0, function* () {
+        yield runFixture('EmptyConstructor.php');
+    }));
     test('Should remove the constructor method when the body is empty after removing the last property', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('ConstructorWithSingleProperty.php');
     }));
     test('Should NOT remove the constructor method when the body is NOT empty after removing the last property', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('ConstructorWithOneProperty.php');
+    }));
+    test('Should NOT remove the constructor argument when the property name does not match', () => __awaiter(this, void 0, void 0, function* () {
+        yield runFixture('ConstructorWithOtherArgument.php');
     }));
     test('Should remove typed properties', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('TypedProperty.php');
@@ -77,4 +83,4 @@ function getInputFilePath(name) {
 function getOutputFilePath(name) {
     return path.join(__dirname + testFolderRelativeLocation + `outputs/${name}`);
 }
-//# sourceMappingURL=RemoveProperty.test.js.map
+//# sourceMappingURL=removeProperty.test.js.map

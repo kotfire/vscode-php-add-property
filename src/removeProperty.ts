@@ -61,14 +61,18 @@ export function removeProperty(editor: vscode.TextEditor, property: Property, ph
 
 	if (constructor) {
 		if (constructor.ast.body?.children.length <= 1) {
-			const constructorRange = new vscode.Range(
-				new vscode.Position(constructor.ast.loc.start.line - 1, 0),
-				new vscode.Position(constructor.ast.loc.end.line, 0)
-			);
+			const node = constructor.ast.arguments[0];
 
-			const constructorText = document.getText(constructorRange);
+			if (constructor.ast.body.children.length == 0 || node.name?.name == property.getName()) {
+				const constructorRange = new vscode.Range(
+					new vscode.Position(constructor.ast.loc.start.line - 1, 0),
+					new vscode.Position(constructor.ast.loc.end.line, 0)
+				);
 
-			newDocumentText = newDocumentText.replace(constructorText, '');
+				const constructorText = document.getText(constructorRange);
+
+				newDocumentText = newDocumentText.replace(constructorText, '');
+			}
 		} else {
 			for (let i = 0; i < constructor.ast.arguments.length; i++) {
 				const node = constructor.ast.arguments[i];
