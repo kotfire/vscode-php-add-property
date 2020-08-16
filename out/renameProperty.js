@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = require("vscode");
 function renameProperty(editor, property, newProperty, phpClass) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f;
     const document = editor.document;
     const phpClassRange = new vscode.Range(new vscode.Position(phpClass.ast.loc.start.line - 1, phpClass.ast.loc.start.column), new vscode.Position(phpClass.ast.loc.end.line - 1, phpClass.ast.loc.end.column));
     let newDocumentText = document.getText(phpClassRange);
@@ -65,6 +65,14 @@ function renameProperty(editor, property, newProperty, phpClass) {
                 break;
             }
         }
+        for (let i = 0; i < ((_e = constructor.ast.leadingComments) === null || _e === void 0 ? void 0 : _e.length); i++) {
+            const commentNode = constructor.ast.leadingComments[i];
+            const commentRange = new vscode.Range(new vscode.Position(commentNode.loc.start.line - 1, 0), new vscode.Position(commentNode.loc.end.line, 0));
+            const commentText = document.getText(commentRange);
+            const regexp = new RegExp(`\\$${property.getName()}(\\s+)`);
+            const newCommentText = commentText.replace(regexp, `\$${newProperty.getName()}$1`);
+            newDocumentText = newDocumentText.replace(commentText, newCommentText);
+        }
     }
     const propertyReferences = findPropertyReferences(phpClass.ast, property.getName());
     for (let i = 0; i < propertyReferences.length; i++) {
@@ -77,7 +85,7 @@ function renameProperty(editor, property, newProperty, phpClass) {
     if (newDocumentText === document.getText(phpClassRange)) {
         return;
     }
-    (_e = vscode.window.activeTextEditor) === null || _e === void 0 ? void 0 : _e.edit(editBuilder => {
+    (_f = vscode.window.activeTextEditor) === null || _f === void 0 ? void 0 : _f.edit(editBuilder => {
         editBuilder.replace(phpClassRange, newDocumentText);
     }, {
         undoStopBefore: true,

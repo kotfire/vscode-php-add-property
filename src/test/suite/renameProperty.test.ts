@@ -42,6 +42,10 @@ suite('Rename Property', function () {
     test('Should rename only one property when there are more than one properties per statement', async () => {
         await runFixture('MultiplePropertyStatements.php');
     });
+
+    test('Should rename constructor param docblock', async () => {
+        await runFixture('ConstructorDocblock.php');
+    });
 });
 
 async function runFixture(fileName: string, cursorPosition?: vscode.Position) {

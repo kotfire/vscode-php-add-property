@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import Property from './property';
 import Class from './class';
-import { escapeForRegExp } from './utils';
 
 export function renameProperty(editor: vscode.TextEditor, property: Property, newProperty: Property, phpClass: Class) {
 	const document = editor.document;
@@ -109,6 +108,25 @@ export function renameProperty(editor: vscode.TextEditor, property: Property, ne
 				newDocumentText = newDocumentText.replace(propertyAssignmentText, newPropertyAssignmentText);
 				break;
 			}
+		}
+
+		for (let i = 0; i < constructor.ast.leadingComments?.length; i++) {
+			const commentNode = constructor.ast.leadingComments[i];
+
+			const commentRange = new vscode.Range(
+				new vscode.Position(commentNode.loc.start.line - 1, 0),
+				new vscode.Position(commentNode.loc.end.line, 0)
+			);
+
+			const commentText = document.getText(commentRange);
+
+			const regexp = new RegExp(`\\$${property.getName()}(\\s+)`);
+			const newCommentText = commentText.replace(
+				regexp,
+				`\$${newProperty.getName()}$1`
+			);
+
+			newDocumentText = newDocumentText.replace(commentText, newCommentText);
 		}
 	}
 

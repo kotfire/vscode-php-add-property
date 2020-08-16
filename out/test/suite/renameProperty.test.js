@@ -43,6 +43,9 @@ suite('Rename Property', function () {
     test('Should rename only one property when there are more than one properties per statement', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('MultiplePropertyStatements.php');
     }));
+    test('Should rename constructor param docblock', () => __awaiter(this, void 0, void 0, function* () {
+        yield runFixture('ConstructorDocblock.php');
+    }));
 });
 function runFixture(fileName, cursorPosition) {
     return __awaiter(this, void 0, void 0, function* () {
