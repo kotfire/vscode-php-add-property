@@ -43,7 +43,7 @@ export function renameProperty(editor: vscode.TextEditor, property: Property, ne
 	const constructor = phpClass.getConstructor();
 
 	if (constructor) {
-		if (constructor.ast.body?.children.length == 1) {
+		if (constructor.ast.arguments.length == 1) {
 			const node = constructor.ast.arguments[0];
 
 			if (node.name?.name == property.getName()) {
@@ -103,6 +103,26 @@ export function renameProperty(editor: vscode.TextEditor, property: Property, ne
 		}
 	}
 
+	const propertyReferences = findPropertyReferences(phpClass.ast, property.getName());
+
+	for (let i = 0; i < propertyReferences.length; i++) {
+		const node = propertyReferences[i];
+
+		const propertyReferenceRange = new vscode.Range(
+			new vscode.Position(node.loc.start.line - 1, 0),
+			new vscode.Position(node.loc.end.line, 0)
+		);
+		
+		const propertyReferenceText = document.getText(propertyReferenceRange);
+
+		const newPropertyReferenceText = propertyReferenceText.replace(
+			`this->${property.getName()}`,
+			`this->${newProperty.getName()}`
+		);
+
+		newDocumentText = newDocumentText.replace(propertyReferenceText, newPropertyReferenceText);
+	}
+
 	if (newDocumentText === document.getText(phpClassRange)) {
 		return;
 	}
@@ -116,4 +136,32 @@ export function renameProperty(editor: vscode.TextEditor, property: Property, ne
 			undoStopAfter: false
 		}
 	);
+}
+
+function findPropertyReferences(ast: any, name: string): any {
+    let propertyReferences: any = [];
+
+    if (Array.isArray(ast)) {
+        for (var i = 0; i < ast.length; i++) {
+			const newPropertyReferences = findPropertyReferences(ast[i], name);
+			for (let i = 0; i < newPropertyReferences.length; i++) {
+				propertyReferences.push(newPropertyReferences[i]);
+			}
+        }
+    } else {
+		if (ast?.kind === 'propertylookup' && ast.offset?.name === name) {
+			return [ast];
+		}
+
+        for (const node in ast) {
+            if (ast.hasOwnProperty(node) && ast[node] !== ast) {
+				const newPropertyReferences = findPropertyReferences(ast[node], name);
+				for (let i = 0; i < newPropertyReferences.length; i++) {
+					propertyReferences.push(newPropertyReferences[i]);
+				}
+            }
+        }
+	}
+	
+	return propertyReferences;
 }

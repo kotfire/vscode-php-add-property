@@ -34,6 +34,10 @@ suite('Rename Property', function () {
     test('Should rename a property when the cursor is placed in its assignment', async () => {
         await runFixture('ConstructorWithMultiplePropertiesCursorInAssignment.php', new vscode.Position(16, 18));
     });
+
+    test('Should rename all property references', async () => {
+        await runFixture('PropertyReferences.php');
+    });
 });
 
 async function runFixture(fileName: string, cursorPosition?: vscode.Position) {
