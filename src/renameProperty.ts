@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import Property from './property';
 import Class from './class';
+import { escapeForRegExp } from './utils';
 
 export function renameProperty(editor: vscode.TextEditor, property: Property, newProperty: Property, phpClass: Class) {
 	const document = editor.document;
@@ -20,19 +21,27 @@ export function renameProperty(editor: vscode.TextEditor, property: Property, ne
 				const propertyNode = node.properties[j];
 
 				if (propertyNode.name?.name === property.getName()) {
-                    const propertyStatementRange = new vscode.Range(
-                        new vscode.Position(node.loc.start.line - 1, 0),
-                        new vscode.Position(node.loc.end.line, 0)
-                    );
-
-                    const propertyStatementText = document.getText(propertyStatementRange);
-
-                    const newPropertyStatementText = propertyStatementText.replace(
-                        property.getName(),
-                        newProperty.getName()
-                    );
-
-                    newDocumentText = newDocumentText.replace(propertyStatementText, newPropertyStatementText);
+					if (node.properties.length === 1) {
+						const propertyStatementRange = new vscode.Range(
+							new vscode.Position(node.loc.start.line - 1, 0),
+							new vscode.Position(node.loc.end.line, 0)
+						);
+	
+						const propertyStatementText = document.getText(propertyStatementRange);
+	
+						const newPropertyStatementText = propertyStatementText.replace(
+							property.getName(),
+							newProperty.getName()
+						);
+	
+						newDocumentText = newDocumentText.replace(propertyStatementText, newPropertyStatementText);
+					} else {
+						const regexp = new RegExp(`\\$${property.getName()}(\\s*,|\\s*;)`);
+						newDocumentText = newDocumentText.replace(
+							regexp,
+							`\$${newProperty.getName()}$1`
+						);
+					}
 
 					break;
 				}

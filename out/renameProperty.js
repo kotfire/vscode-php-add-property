@@ -13,10 +13,16 @@ function renameProperty(editor, property, newProperty, phpClass) {
             for (let j = 0; j < node.properties.length; j++) {
                 const propertyNode = node.properties[j];
                 if (((_a = propertyNode.name) === null || _a === void 0 ? void 0 : _a.name) === property.getName()) {
-                    const propertyStatementRange = new vscode.Range(new vscode.Position(node.loc.start.line - 1, 0), new vscode.Position(node.loc.end.line, 0));
-                    const propertyStatementText = document.getText(propertyStatementRange);
-                    const newPropertyStatementText = propertyStatementText.replace(property.getName(), newProperty.getName());
-                    newDocumentText = newDocumentText.replace(propertyStatementText, newPropertyStatementText);
+                    if (node.properties.length === 1) {
+                        const propertyStatementRange = new vscode.Range(new vscode.Position(node.loc.start.line - 1, 0), new vscode.Position(node.loc.end.line, 0));
+                        const propertyStatementText = document.getText(propertyStatementRange);
+                        const newPropertyStatementText = propertyStatementText.replace(property.getName(), newProperty.getName());
+                        newDocumentText = newDocumentText.replace(propertyStatementText, newPropertyStatementText);
+                    }
+                    else {
+                        const regexp = new RegExp(`\\$${property.getName()}(\\s*,|\\s*;)`);
+                        newDocumentText = newDocumentText.replace(regexp, `\$${newProperty.getName()}$1`);
+                    }
                     break;
                 }
             }

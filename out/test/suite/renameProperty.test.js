@@ -40,6 +40,9 @@ suite('Rename Property', function () {
     test('Should rename all property references', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('PropertyReferences.php');
     }));
+    test('Should rename only one property when there are more than one properties per statement', () => __awaiter(this, void 0, void 0, function* () {
+        yield runFixture('MultiplePropertyStatements.php');
+    }));
 });
 function runFixture(fileName, cursorPosition) {
     return __awaiter(this, void 0, void 0, function* () {
