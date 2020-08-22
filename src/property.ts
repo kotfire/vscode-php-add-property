@@ -111,5 +111,4 @@ export default class Property {
 
         return ` * @param ${constructorParamDocblockText}`;
     }
-
 }

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import PhpEngine from 'php-parser';
 
 export function getVisibilityChoice(defaultValue: string): string {
     let visibilityChoices = ['public', 'protected', 'private'];
@@ -55,6 +56,47 @@ export function forceBreakConstructorIntoMultiline(text: string): string {
     }
 
     return text.replace(match[0], getMultilineConstructorText(match[0], match[1], match[2]));
+}
+
+export function getPropertyNameFromLineText(
+    lineText: string,
+    document: vscode.TextDocument,
+    phpEngine: PhpEngine,
+    cursorPosition: vscode.Position
+): string|undefined {
+    const paramRegex = /@param(?:\s+\S+)?\s+\$(\S+).*/;
+
+    const matchParam = paramRegex.exec(lineText);
+
+    if (matchParam) {
+        return matchParam[1];
+    } else {
+        const lineAst = (phpEngine.parseEval(`class A { ${lineText} }`) as any);
+
+        const selectedWord = document.getText(document.getWordRangeAtPosition(cursorPosition)).replace(/^\$/, '');
+        
+        if (lineAst.children[0]?.body[0]?.kind === 'propertystatement') {
+            const properties = (lineAst.children[0].body[0].properties as any[]);
+
+            const propertyAst = properties.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? properties[0];
+            let propertyName = propertyAst.name?.name;
+
+            if (propertyName === 'this') {
+                const assignmentAst = (phpEngine.parseEval(`class A { public function __construct() { ${lineText} } }`) as any);
+
+                if (assignmentAst.children[0]?.body[0]?.body?.children[0]?.kind === 'expressionstatement') {
+                    propertyName = assignmentAst.children[0].body[0].body.children[0].expression.right?.name;
+                }
+            }
+
+            return propertyName;
+        } else if (lineAst.children[0]?.body[0]?.kind === 'method') {
+            const constructorArgs = (lineAst.children[0].body[0].arguments as any[]);
+
+            const argumentAst = constructorArgs.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? constructorArgs[0];
+            return argumentAst.name?.name;
+        }
+    }
 }
 
 export function calculateIndentationLevel(index: number): number {

@@ -4,7 +4,7 @@ import Locator from './locator';
 import Property from './property';
 import insertProperty from './insertProperty';
 import { removeProperty } from './removeProperty';
-import { forceBreakConstructorIntoMultiline } from './utils';
+import { forceBreakConstructorIntoMultiline, getPropertyNameFromLineText } from './utils';
 import { renameProperty } from './renameProperty';
 import { changePropertyType } from './changePropertyType';
 
@@ -191,33 +191,15 @@ export function activate(context: vscode.ExtensionContext) {
 
 				return;
 			}
-
+			
 			const line = document.lineAt(selectionLineNumber);
-
-			const lineAst = (phpEngine.parseEval(`class A { ${line.text} }`) as any);
-
-			const selectedWord = document.getText(document.getWordRangeAtPosition(vscode.window.activeTextEditor.selection.active)).replace(/^\$/, '');
-
-			let propertyName;
-			if (lineAst.children[0]?.body[0]?.kind === 'propertystatement') {
-				const properties = (lineAst.children[0].body[0].properties as any[]);
-
-				const propertyAst = properties.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? properties[0];
-				propertyName = propertyAst.name?.name;
-
-				if (propertyName === 'this') {
-					const assignmentAst = (phpEngine.parseEval(`class A { public function __construct() { ${line.text} } }`) as any);
-
-					if (assignmentAst.children[0]?.body[0]?.body?.children[0]?.kind === 'expressionstatement') {
-						propertyName = assignmentAst.children[0].body[0].body.children[0].expression.right?.name;
-					}
-				}
-			} else if (lineAst.children[0]?.body[0]?.kind === 'method') {
-				const constructorArgs = (lineAst.children[0].body[0].arguments as any[]);
-
-				const argumentAst = constructorArgs.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? constructorArgs[0];
-				propertyName = argumentAst.name?.name;
-			}
+			
+			let propertyName = getPropertyNameFromLineText(
+				line.text,
+				document,
+				phpEngine,
+				vscode.window.activeTextEditor.selection.active
+			);
 
 			if (!propertyName) {
 				propertyName = await vscode.window.showInputBox({
@@ -285,31 +267,13 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			const line = document.lineAt(selectionLineNumber);
-
-			const lineAst = (phpEngine.parseEval(`class A { ${line.text} }`) as any);
-
-			const selectedWord = document.getText(document.getWordRangeAtPosition(vscode.window.activeTextEditor.selection.active)).replace(/^\$/, '');
-
-			let propertyName;
-			if (lineAst.children[0]?.body[0]?.kind === 'propertystatement') {
-				const properties = (lineAst.children[0].body[0].properties as any[]);
-
-				const propertyAst = properties.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? properties[0];
-				propertyName = propertyAst.name?.name;
-
-				if (propertyName === 'this') {
-					const assignmentAst = (phpEngine.parseEval(`class A { public function __construct() { ${line.text} } }`) as any);
-
-					if (assignmentAst.children[0]?.body[0]?.body?.children[0]?.kind === 'expressionstatement') {
-						propertyName = assignmentAst.children[0].body[0].body.children[0].expression.right?.name;
-					}
-				}
-			} else if (lineAst.children[0]?.body[0]?.kind === 'method') {
-				const constructorArgs = (lineAst.children[0].body[0].arguments as any[]);
-
-				const argumentAst = constructorArgs.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? constructorArgs[0];
-				propertyName = argumentAst.name?.name;
-			}
+			
+			let propertyName = getPropertyNameFromLineText(
+				line.text,
+				document,
+				phpEngine,
+				vscode.window.activeTextEditor.selection.active
+			);
 
 			if (!propertyName) {
 				propertyName = await vscode.window.showInputBox({
@@ -374,41 +338,14 @@ export function activate(context: vscode.ExtensionContext) {
 				return;
 			}
 
-			let propertyName;
-
 			const line = document.lineAt(selectionLineNumber);
-
-			const paramRegex = /@param(?:\s+\S+)?\s+\$(\S+).*/;
-
-			const matchParam = paramRegex.exec(line.text);
-
-			if (matchParam) {
-				propertyName = matchParam[1];
-			} else {
-				const lineAst = (phpEngine.parseEval(`class A { ${line.text} }`) as any);
-
-				const selectedWord = document.getText(document.getWordRangeAtPosition(vscode.window.activeTextEditor.selection.active)).replace(/^\$/, '');
-				
-				if (lineAst.children[0]?.body[0]?.kind === 'propertystatement') {
-					const properties = (lineAst.children[0].body[0].properties as any[]);
-
-					const propertyAst = properties.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? properties[0];
-					propertyName = propertyAst.name?.name;
-
-					if (propertyName === 'this') {
-						const assignmentAst = (phpEngine.parseEval(`class A { public function __construct() { ${line.text} } }`) as any);
-
-						if (assignmentAst.children[0]?.body[0]?.body?.children[0]?.kind === 'expressionstatement') {
-							propertyName = assignmentAst.children[0].body[0].body.children[0].expression.right?.name;
-						}
-					}
-				} else if (lineAst.children[0]?.body[0]?.kind === 'method') {
-					const constructorArgs = (lineAst.children[0].body[0].arguments as any[]);
-
-					const argumentAst = constructorArgs.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? constructorArgs[0];
-					propertyName = argumentAst.name?.name;
-				}
-			}
+			
+			let propertyName = getPropertyNameFromLineText(
+				line.text,
+				document,
+				phpEngine,
+				vscode.window.activeTextEditor.selection.active
+			);
 
 			if (!propertyName) {
 				propertyName = await vscode.window.showInputBox({

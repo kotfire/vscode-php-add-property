@@ -46,6 +46,36 @@ function forceBreakConstructorIntoMultiline(text) {
     return text.replace(match[0], getMultilineConstructorText(match[0], match[1], match[2]));
 }
 exports.forceBreakConstructorIntoMultiline = forceBreakConstructorIntoMultiline;
+function getPropertyNameFromLineText(lineText, document, phpEngine, cursorPosition) {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+    const paramRegex = /@param(?:\s+\S+)?\s+\$(\S+).*/;
+    const matchParam = paramRegex.exec(lineText);
+    if (matchParam) {
+        return matchParam[1];
+    }
+    else {
+        const lineAst = phpEngine.parseEval(`class A { ${lineText} }`);
+        const selectedWord = document.getText(document.getWordRangeAtPosition(cursorPosition)).replace(/^\$/, '');
+        if (((_b = (_a = lineAst.children[0]) === null || _a === void 0 ? void 0 : _a.body[0]) === null || _b === void 0 ? void 0 : _b.kind) === 'propertystatement') {
+            const properties = lineAst.children[0].body[0].properties;
+            const propertyAst = (_c = properties.find((propertyAst) => { var _a; return ((_a = propertyAst.name) === null || _a === void 0 ? void 0 : _a.name) === selectedWord; })) !== null && _c !== void 0 ? _c : properties[0];
+            let propertyName = (_d = propertyAst.name) === null || _d === void 0 ? void 0 : _d.name;
+            if (propertyName === 'this') {
+                const assignmentAst = phpEngine.parseEval(`class A { public function __construct() { ${lineText} } }`);
+                if (((_h = (_g = (_f = (_e = assignmentAst.children[0]) === null || _e === void 0 ? void 0 : _e.body[0]) === null || _f === void 0 ? void 0 : _f.body) === null || _g === void 0 ? void 0 : _g.children[0]) === null || _h === void 0 ? void 0 : _h.kind) === 'expressionstatement') {
+                    propertyName = (_j = assignmentAst.children[0].body[0].body.children[0].expression.right) === null || _j === void 0 ? void 0 : _j.name;
+                }
+            }
+            return propertyName;
+        }
+        else if (((_l = (_k = lineAst.children[0]) === null || _k === void 0 ? void 0 : _k.body[0]) === null || _l === void 0 ? void 0 : _l.kind) === 'method') {
+            const constructorArgs = lineAst.children[0].body[0].arguments;
+            const argumentAst = (_m = constructorArgs.find((propertyAst) => { var _a; return ((_a = propertyAst.name) === null || _a === void 0 ? void 0 : _a.name) === selectedWord; })) !== null && _m !== void 0 ? _m : constructorArgs[0];
+            return (_o = argumentAst.name) === null || _o === void 0 ? void 0 : _o.name;
+        }
+    }
+}
+exports.getPropertyNameFromLineText = getPropertyNameFromLineText;
 function calculateIndentationLevel(index) {
     return Math.floor(index / configUsingResource('editor.tabSize'));
 }
