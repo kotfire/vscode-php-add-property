@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = require("vscode");
 const utils_1 = require("./utils");
 function removeProperty(editor, property, phpClass) {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     const document = editor.document;
     const phpClassRange = new vscode.Range(new vscode.Position(phpClass.ast.loc.start.line - 1, phpClass.ast.loc.start.column), new vscode.Position(phpClass.ast.loc.end.line - 1, phpClass.ast.loc.end.column));
     let newDocumentText = document.getText(phpClassRange);
@@ -71,11 +71,19 @@ function removeProperty(editor, property, phpClass) {
                 }
             }
         }
+        for (let i = 0; i < ((_g = constructor.ast.leadingComments) === null || _g === void 0 ? void 0 : _g.length); i++) {
+            const commentNode = constructor.ast.leadingComments[i];
+            const commentRange = new vscode.Range(new vscode.Position(commentNode.loc.start.line - 1, 0), new vscode.Position(commentNode.loc.end.line, 0));
+            const commentText = document.getText(commentRange);
+            const regexp = new RegExp(`.*\\*.*\\$${property.getName()}\\s*[\r\n]+`);
+            const newCommentText = commentText.replace(regexp, '');
+            newDocumentText = newDocumentText.replace(commentText, newCommentText);
+        }
     }
     if (newDocumentText === document.getText(phpClassRange)) {
         return;
     }
-    (_g = vscode.window.activeTextEditor) === null || _g === void 0 ? void 0 : _g.edit(editBuilder => {
+    (_h = vscode.window.activeTextEditor) === null || _h === void 0 ? void 0 : _h.edit(editBuilder => {
         editBuilder.replace(phpClassRange, newDocumentText);
     }, {
         undoStopBefore: true,

@@ -106,6 +106,22 @@ export function removeProperty(editor: vscode.TextEditor, property: Property, ph
 				}
 			}
 		}
+
+		for (let i = 0; i < constructor.ast.leadingComments?.length; i++) {
+			const commentNode = constructor.ast.leadingComments[i];
+
+			const commentRange = new vscode.Range(
+				new vscode.Position(commentNode.loc.start.line - 1, 0),
+				new vscode.Position(commentNode.loc.end.line, 0)
+			);
+
+			const commentText = document.getText(commentRange);
+
+            const regexp = new RegExp(`.*\\*.*\\$${property.getName()}\\s*[\r\n]+`);
+			const newCommentText = commentText.replace(regexp, '');
+
+			newDocumentText = newDocumentText.replace(commentText, newCommentText);
+		}
 	}
 
 	if (newDocumentText === document.getText(phpClassRange)) {

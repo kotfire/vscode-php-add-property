@@ -43,6 +43,9 @@ suite('Remove Property', function () {
     test('Should remove the property docblock', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('PropertyWithDocblock.php');
     }));
+    test('Should remove the property from the constructor docblock', () => __awaiter(this, void 0, void 0, function* () {
+        yield runFixture('ConstructorDocblock.php');
+    }));
     test('Should remove a property when the cursor is placed in its statement', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('ConstructorWithMultiplePropertiesCursorInPropertyStatement.php', new vscode.Position(11, 13));
     }));

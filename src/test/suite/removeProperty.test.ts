@@ -42,6 +42,10 @@ suite('Remove Property', function () {
     test('Should remove the property docblock', async () => {
         await runFixture('PropertyWithDocblock.php');
     });
+    
+    test('Should remove the property from the constructor docblock', async () => {
+        await runFixture('ConstructorDocblock.php');
+    });
 
     test('Should remove a property when the cursor is placed in its statement', async () => {
         await runFixture('ConstructorWithMultiplePropertiesCursorInPropertyStatement.php', new vscode.Position(11, 13));
