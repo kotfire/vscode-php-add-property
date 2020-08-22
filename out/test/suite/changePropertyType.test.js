@@ -28,6 +28,10 @@ suite('Change Property Type', function () {
     test('Should change the property statement type if already exists', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('TypedPropertyStatement.php');
     }));
+    test('Should change the property statement type if typed properties is enabled', () => __awaiter(this, void 0, void 0, function* () {
+        yield vscode.workspace.getConfiguration('phpAddProperty').update('property.types', true, true);
+        yield runFixture('PropertyWithoutType.php');
+    }));
 });
 function runFixture(fileName, cursorPosition) {
     return __awaiter(this, void 0, void 0, function* () {

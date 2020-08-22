@@ -22,6 +22,11 @@ suite('Change Property Type', function () {
     test('Should change the property statement type if already exists', async () => {
         await runFixture('TypedPropertyStatement.php');
     });
+    
+    test('Should change the property statement type if typed properties is enabled', async () => {
+        await vscode.workspace.getConfiguration('phpAddProperty').update('property.types', true, true);
+        await runFixture('PropertyWithoutType.php');
+    });
 });
 
 async function runFixture(fileName: string, cursorPosition?: vscode.Position) {

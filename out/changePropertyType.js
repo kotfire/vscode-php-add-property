@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = require("vscode");
+const utils_1 = require("./utils");
 function changePropertyType(editor, property, newPropertyType, phpClass) {
     var _a, _b, _c;
     const document = editor.document;
@@ -16,7 +17,7 @@ function changePropertyType(editor, property, newPropertyType, phpClass) {
                     const propertyStatementRange = new vscode.Range(new vscode.Position(node.loc.start.line - 1, 0), new vscode.Position(node.loc.end.line, 0));
                     const propertyStatementText = document.getText(propertyStatementRange);
                     let newPropertyText = `\$${property.getName()}`;
-                    if (propertyNode.type) {
+                    if (utils_1.config('phpAddProperty.property.types') === true || propertyNode.type) {
                         newPropertyText = `${newPropertyType} ${newPropertyText}`;
                     }
                     const newPropertyStatementText = propertyStatementText.replace(propertyNode.loc.source, newPropertyText);

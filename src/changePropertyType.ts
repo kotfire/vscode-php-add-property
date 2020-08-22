@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import Property from './property';
 import Class from './class';
+import { config } from './utils';
 
 export function changePropertyType(editor: vscode.TextEditor, property: Property, newPropertyType: string, phpClass: Class) {
 	const document = editor.document;
@@ -29,7 +30,7 @@ export function changePropertyType(editor: vscode.TextEditor, property: Property
 
                     let newPropertyText = `\$${property.getName()}`;
 
-                    if (propertyNode.type) {
+                    if (config('phpAddProperty.property.types') === true || propertyNode.type) {
                         newPropertyText = `${newPropertyType} ${newPropertyText}`;
                     }
 	
