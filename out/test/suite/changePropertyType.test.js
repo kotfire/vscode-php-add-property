@@ -41,6 +41,9 @@ suite('Change Property Type', function () {
     test('Should change property type in constructor docblock', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('ConstructorDocblock.php');
     }));
+    test('Should rename a property when the cursor is placed in its constructor docblock param', () => __awaiter(this, void 0, void 0, function* () {
+        yield runFixture('ConstructorWithMultiplePropertiesCursorInConstructorDocblock.php', new vscode.Position(15, 17));
+    }));
 });
 function runFixture(fileName, cursorPosition) {
     return __awaiter(this, void 0, void 0, function* () {

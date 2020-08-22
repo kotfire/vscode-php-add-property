@@ -5,20 +5,18 @@ namespace StarWars;
 
 class Jedi
 {
-    private $class;
-
+    /** @var string */
     private $name;
 
+    /** @var Rank */
     private $rank;
 
     /**
-     * @param mixed $class
-     * @param string $name
-     * @param mixed $rank
+     * @param $name string
+     * @param $rank Rank
      */
-    public function __construct($class, string $name, $rank)
+    public function __construct($name, $rank)
     {
-        $this->class = $class;
         $this->name = $name;
         $this->rank = $rank;
     }
