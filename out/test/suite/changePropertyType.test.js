@@ -38,6 +38,9 @@ suite('Change Property Type', function () {
     test('Should NOT change other properties statement docblock type', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('OtherPropertiesStatementDocblock.php');
     }));
+    test('Should change property type in constructor docblock', () => __awaiter(this, void 0, void 0, function* () {
+        yield runFixture('ConstructorDocblock.php');
+    }));
 });
 function runFixture(fileName, cursorPosition) {
     return __awaiter(this, void 0, void 0, function* () {

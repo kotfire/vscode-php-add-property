@@ -91,6 +91,25 @@ export function changePropertyType(editor: vscode.TextEditor, property: Property
                 newDocumentText = newDocumentText.replace(constructorText, newConstructorText);
                 break;
             }
+        }
+        
+        for (let i = 0; i < constructor.ast.leadingComments?.length; i++) {
+			const commentNode = constructor.ast.leadingComments[i];
+
+			const commentRange = new vscode.Range(
+				new vscode.Position(commentNode.loc.start.line - 1, 0),
+				new vscode.Position(commentNode.loc.end.line, 0)
+			);
+
+			const commentText = document.getText(commentRange);
+
+            const regexp = new RegExp(`\\S*(\\s+\\$${property.getName()})`);
+			const newCommentText = commentText.replace(
+				regexp,
+				`${newPropertyType}$1`
+			);
+
+			newDocumentText = newDocumentText.replace(commentText, newCommentText);
 		}
 	}
 
