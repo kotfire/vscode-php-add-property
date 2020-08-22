@@ -27,6 +27,10 @@ suite('Change Property Type', function () {
         await vscode.workspace.getConfiguration('phpAddProperty').update('property.types', true, true);
         await runFixture('PropertyWithoutType.php');
     });
+
+    test('Should change property statement docblock type', async () => {
+        await runFixture('PropertyStatementDocblock.php');
+    });
 });
 
 async function runFixture(fileName: string, cursorPosition?: vscode.Position) {

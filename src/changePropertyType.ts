@@ -12,15 +12,18 @@ export function changePropertyType(editor: vscode.TextEditor, property: Property
 
 	let newDocumentText = document.getText(phpClassRange);
 
-	const astClassBody = phpClass.ast.body;
+    const astClassBody = phpClass.ast.body;
 	for (let i = 0; i < astClassBody.length; i++) {
 		const node = astClassBody[i];
 
 		if (node.kind === 'propertystatement') {
+            let propertyFound = false;
+
 			for (let j = 0; j < node.properties.length; j++) {
                 const propertyNode = node.properties[j];
                 
                 if (propertyNode.name?.name == property.getName()) {
+                    propertyFound = true;
                     const propertyStatementRange = new vscode.Range(
                         new vscode.Position(node.loc.start.line - 1, 0),
                         new vscode.Position(node.loc.end.line, 0)
@@ -41,7 +44,30 @@ export function changePropertyType(editor: vscode.TextEditor, property: Property
 
                     newDocumentText = newDocumentText.replace(propertyStatementText, newPropertyStatementText);
                 }
-			}
+            }
+            
+            if (propertyFound) {
+                for (let i = 0; i < node.leadingComments?.length; i++) {
+                    const commentNode = node.leadingComments[i];
+        
+                    const commentRange = new vscode.Range(
+                        new vscode.Position(commentNode.loc.start.line - 1, 0),
+                        new vscode.Position(commentNode.loc.end.line, 0)
+                    );
+        
+                    const commentText = document.getText(commentRange);
+        
+                    const typeMatch = /@var\s(\S*)/g.exec(commentText);
+
+                    if (typeMatch) {
+                        const newCommentText = commentText.replace(typeMatch[1], newPropertyType);
+
+                        newDocumentText = newDocumentText.replace(commentText, newCommentText);
+                    }
+                }
+
+                break;
+            }
 		}
     }
     
