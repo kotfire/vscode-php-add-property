@@ -26,10 +26,16 @@ export function changePropertyType(editor: vscode.TextEditor, property: Property
                     );
 
                     const propertyStatementText = document.getText(propertyStatementRange);
+
+                    let newPropertyText = `\$${property.getName()}`;
+
+                    if (propertyNode.type) {
+                        newPropertyText = `${newPropertyType} ${newPropertyText}`;
+                    }
 	
                     const newPropertyStatementText = propertyStatementText.replace(
                         propertyNode.loc.source,
-                        `\$${property.getName()}`
+                        newPropertyText
                     );
 
                     newDocumentText = newDocumentText.replace(propertyStatementText, newPropertyStatementText);

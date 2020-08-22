@@ -25,6 +25,9 @@ suite('Change Property Type', function () {
     test('Should change a property type by name', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('ConstructorWithMultipleProperties.php');
     }));
+    test('Should change the property statement type if already exists', () => __awaiter(this, void 0, void 0, function* () {
+        yield runFixture('TypedPropertyStatement.php');
+    }));
 });
 function runFixture(fileName, cursorPosition) {
     return __awaiter(this, void 0, void 0, function* () {

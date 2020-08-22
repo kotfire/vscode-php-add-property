@@ -15,7 +15,11 @@ function changePropertyType(editor, property, newPropertyType, phpClass) {
                 if (((_a = propertyNode.name) === null || _a === void 0 ? void 0 : _a.name) == property.getName()) {
                     const propertyStatementRange = new vscode.Range(new vscode.Position(node.loc.start.line - 1, 0), new vscode.Position(node.loc.end.line, 0));
                     const propertyStatementText = document.getText(propertyStatementRange);
-                    const newPropertyStatementText = propertyStatementText.replace(propertyNode.loc.source, `\$${property.getName()}`);
+                    let newPropertyText = `\$${property.getName()}`;
+                    if (propertyNode.type) {
+                        newPropertyText = `${newPropertyType} ${newPropertyText}`;
+                    }
+                    const newPropertyStatementText = propertyStatementText.replace(propertyNode.loc.source, newPropertyText);
                     newDocumentText = newDocumentText.replace(propertyStatementText, newPropertyStatementText);
                 }
             }

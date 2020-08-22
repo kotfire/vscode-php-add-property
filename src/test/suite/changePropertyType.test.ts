@@ -18,6 +18,10 @@ suite('Change Property Type', function () {
     test('Should change a property type by name', async () => {
         await runFixture('ConstructorWithMultipleProperties.php');
     });
+
+    test('Should change the property statement type if already exists', async () => {
+        await runFixture('TypedPropertyStatement.php');
+    });
 });
 
 async function runFixture(fileName: string, cursorPosition?: vscode.Position) {
