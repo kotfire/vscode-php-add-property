@@ -37,6 +37,9 @@ suite('Remove Property', function () {
     test('Should NOT remove the constructor argument when the property name does not match', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('ConstructorWithOtherArgument.php');
     }));
+    test('Should remove the constructor docblock along with the constructor', () => __awaiter(this, void 0, void 0, function* () {
+        yield runFixture('ConstructorWithSinglePropertyAndDocblock.php');
+    }));
     test('Should remove typed properties', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('TypedProperty.php');
     }));

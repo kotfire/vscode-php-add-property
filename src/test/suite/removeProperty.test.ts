@@ -35,6 +35,10 @@ suite('Remove Property', function () {
         await runFixture('ConstructorWithOtherArgument.php');
     });
 
+    test('Should remove the constructor docblock along with the constructor', async () => {
+        await runFixture('ConstructorWithSinglePropertyAndDocblock.php');
+    });
+
     test('Should remove typed properties', async () => {
         await runFixture('TypedProperty.php');
     });

@@ -22,9 +22,18 @@ export function removeProperty(editor: vscode.TextEditor, property: Property, ph
 
 				if (propertyNode.name?.name === property.getName()) {
 					if (node.properties.length === 1) {
-						const nextNotEmptyLine = i + 1 < astClassBody.length
-							? astClassBody[i + 1].loc.start.line - 1
-							: node.loc.end.line;
+						let nextNotEmptyLine = node.loc.end.line;
+
+						if (i + 1 < astClassBody.length) {
+							const nextNode = astClassBody[i + 1];
+
+							const startLine = nextNode.leadingComments
+								? nextNode.leadingComments[0].loc.start.line
+								: nextNode.loc.start.line;
+							
+							nextNotEmptyLine = startLine - 1;
+						}
+
 						const propertyStatementRange = new vscode.Range(
 							new vscode.Position(node.loc.start.line - 1, 0),
 							new vscode.Position(nextNotEmptyLine, 0)
@@ -72,6 +81,19 @@ export function removeProperty(editor: vscode.TextEditor, property: Property, ph
 				const constructorText = document.getText(constructorRange);
 
 				newDocumentText = newDocumentText.replace(constructorText, '');
+
+				for (let i = 0; i < constructor.ast.leadingComments?.length; i++) {
+					const commentNode = constructor.ast.leadingComments[i];
+		
+					const commentRange = new vscode.Range(
+						new vscode.Position(commentNode.loc.start.line - 1, 0),
+						new vscode.Position(commentNode.loc.end.line, 0)
+					);
+		
+					const commentText = document.getText(commentRange);
+		
+					newDocumentText = newDocumentText.replace(commentText, '');
+				}
 			}
 		} else {
 			for (let i = 0; i < constructor.ast.arguments.length; i++) {
@@ -105,22 +127,22 @@ export function removeProperty(editor: vscode.TextEditor, property: Property, ph
 					break;
 				}
 			}
-		}
 
-		for (let i = 0; i < constructor.ast.leadingComments?.length; i++) {
-			const commentNode = constructor.ast.leadingComments[i];
-
-			const commentRange = new vscode.Range(
-				new vscode.Position(commentNode.loc.start.line - 1, 0),
-				new vscode.Position(commentNode.loc.end.line, 0)
-			);
-
-			const commentText = document.getText(commentRange);
-
-            const regexp = new RegExp(`.*\\*.*\\$${property.getName()}\\s*[\r\n]+`);
-			const newCommentText = commentText.replace(regexp, '');
-
-			newDocumentText = newDocumentText.replace(commentText, newCommentText);
+			for (let i = 0; i < constructor.ast.leadingComments?.length; i++) {
+				const commentNode = constructor.ast.leadingComments[i];
+	
+				const commentRange = new vscode.Range(
+					new vscode.Position(commentNode.loc.start.line - 1, 0),
+					new vscode.Position(commentNode.loc.end.line, 0)
+				);
+	
+				const commentText = document.getText(commentRange);
+	
+				const regexp = new RegExp(`.*\\*.*\\$${property.getName()}\\s*[\r\n]+`);
+				const newCommentText = commentText.replace(regexp, '');
+	
+				newDocumentText = newDocumentText.replace(commentText, newCommentText);
+			}
 		}
 	}
 
