@@ -295,25 +295,32 @@ function activate(context) {
             vscode.window.showInformationMessage('No class found');
             return;
         }
-        const line = document.lineAt(selectionLineNumber);
-        const lineAst = phpEngine.parseEval(`class A { ${line.text} }`);
-        const selectedWord = document.getText(document.getWordRangeAtPosition(vscode.window.activeTextEditor.selection.active)).replace(/^\$/, '');
         let propertyName;
-        if (((_10 = (_9 = lineAst.children[0]) === null || _9 === void 0 ? void 0 : _9.body[0]) === null || _10 === void 0 ? void 0 : _10.kind) === 'propertystatement') {
-            const properties = lineAst.children[0].body[0].properties;
-            const propertyAst = (_11 = properties.find((propertyAst) => { var _a; return ((_a = propertyAst.name) === null || _a === void 0 ? void 0 : _a.name) === selectedWord; })) !== null && _11 !== void 0 ? _11 : properties[0];
-            propertyName = (_12 = propertyAst.name) === null || _12 === void 0 ? void 0 : _12.name;
-            if (propertyName === 'this') {
-                const assignmentAst = phpEngine.parseEval(`class A { public function __construct() { ${line.text} } }`);
-                if (((_16 = (_15 = (_14 = (_13 = assignmentAst.children[0]) === null || _13 === void 0 ? void 0 : _13.body[0]) === null || _14 === void 0 ? void 0 : _14.body) === null || _15 === void 0 ? void 0 : _15.children[0]) === null || _16 === void 0 ? void 0 : _16.kind) === 'expressionstatement') {
-                    propertyName = (_17 = assignmentAst.children[0].body[0].body.children[0].expression.right) === null || _17 === void 0 ? void 0 : _17.name;
+        const line = document.lineAt(selectionLineNumber);
+        const paramRegex = /@param(?:\s+\S+)?\s+\$(\S+).*/;
+        const matchParam = paramRegex.exec(line.text);
+        if (matchParam) {
+            propertyName = matchParam[1];
+        }
+        else {
+            const lineAst = phpEngine.parseEval(`class A { ${line.text} }`);
+            const selectedWord = document.getText(document.getWordRangeAtPosition(vscode.window.activeTextEditor.selection.active)).replace(/^\$/, '');
+            if (((_10 = (_9 = lineAst.children[0]) === null || _9 === void 0 ? void 0 : _9.body[0]) === null || _10 === void 0 ? void 0 : _10.kind) === 'propertystatement') {
+                const properties = lineAst.children[0].body[0].properties;
+                const propertyAst = (_11 = properties.find((propertyAst) => { var _a; return ((_a = propertyAst.name) === null || _a === void 0 ? void 0 : _a.name) === selectedWord; })) !== null && _11 !== void 0 ? _11 : properties[0];
+                propertyName = (_12 = propertyAst.name) === null || _12 === void 0 ? void 0 : _12.name;
+                if (propertyName === 'this') {
+                    const assignmentAst = phpEngine.parseEval(`class A { public function __construct() { ${line.text} } }`);
+                    if (((_16 = (_15 = (_14 = (_13 = assignmentAst.children[0]) === null || _13 === void 0 ? void 0 : _13.body[0]) === null || _14 === void 0 ? void 0 : _14.body) === null || _15 === void 0 ? void 0 : _15.children[0]) === null || _16 === void 0 ? void 0 : _16.kind) === 'expressionstatement') {
+                        propertyName = (_17 = assignmentAst.children[0].body[0].body.children[0].expression.right) === null || _17 === void 0 ? void 0 : _17.name;
+                    }
                 }
             }
-        }
-        else if (((_19 = (_18 = lineAst.children[0]) === null || _18 === void 0 ? void 0 : _18.body[0]) === null || _19 === void 0 ? void 0 : _19.kind) === 'method') {
-            const constructorArgs = lineAst.children[0].body[0].arguments;
-            const argumentAst = (_20 = constructorArgs.find((propertyAst) => { var _a; return ((_a = propertyAst.name) === null || _a === void 0 ? void 0 : _a.name) === selectedWord; })) !== null && _20 !== void 0 ? _20 : constructorArgs[0];
-            propertyName = (_21 = argumentAst.name) === null || _21 === void 0 ? void 0 : _21.name;
+            else if (((_19 = (_18 = lineAst.children[0]) === null || _18 === void 0 ? void 0 : _18.body[0]) === null || _19 === void 0 ? void 0 : _19.kind) === 'method') {
+                const constructorArgs = lineAst.children[0].body[0].arguments;
+                const argumentAst = (_20 = constructorArgs.find((propertyAst) => { var _a; return ((_a = propertyAst.name) === null || _a === void 0 ? void 0 : _a.name) === selectedWord; })) !== null && _20 !== void 0 ? _20 : constructorArgs[0];
+                propertyName = (_21 = argumentAst.name) === null || _21 === void 0 ? void 0 : _21.name;
+            }
         }
         if (!propertyName) {
             propertyName = yield vscode.window.showInputBox({

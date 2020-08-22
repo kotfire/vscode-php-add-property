@@ -374,31 +374,40 @@ export function activate(context: vscode.ExtensionContext) {
 				return;
 			}
 
+			let propertyName;
+
 			const line = document.lineAt(selectionLineNumber);
 
-			const lineAst = (phpEngine.parseEval(`class A { ${line.text} }`) as any);
+			const paramRegex = /@param(?:\s+\S+)?\s+\$(\S+).*/;
 
-			const selectedWord = document.getText(document.getWordRangeAtPosition(vscode.window.activeTextEditor.selection.active)).replace(/^\$/, '');
+			const matchParam = paramRegex.exec(line.text);
 
-			let propertyName;
-			if (lineAst.children[0]?.body[0]?.kind === 'propertystatement') {
-				const properties = (lineAst.children[0].body[0].properties as any[]);
+			if (matchParam) {
+				propertyName = matchParam[1];
+			} else {
+				const lineAst = (phpEngine.parseEval(`class A { ${line.text} }`) as any);
 
-				const propertyAst = properties.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? properties[0];
-				propertyName = propertyAst.name?.name;
+				const selectedWord = document.getText(document.getWordRangeAtPosition(vscode.window.activeTextEditor.selection.active)).replace(/^\$/, '');
+				
+				if (lineAst.children[0]?.body[0]?.kind === 'propertystatement') {
+					const properties = (lineAst.children[0].body[0].properties as any[]);
 
-				if (propertyName === 'this') {
-					const assignmentAst = (phpEngine.parseEval(`class A { public function __construct() { ${line.text} } }`) as any);
+					const propertyAst = properties.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? properties[0];
+					propertyName = propertyAst.name?.name;
 
-					if (assignmentAst.children[0]?.body[0]?.body?.children[0]?.kind === 'expressionstatement') {
-						propertyName = assignmentAst.children[0].body[0].body.children[0].expression.right?.name;
+					if (propertyName === 'this') {
+						const assignmentAst = (phpEngine.parseEval(`class A { public function __construct() { ${line.text} } }`) as any);
+
+						if (assignmentAst.children[0]?.body[0]?.body?.children[0]?.kind === 'expressionstatement') {
+							propertyName = assignmentAst.children[0].body[0].body.children[0].expression.right?.name;
+						}
 					}
-				}
-			} else if (lineAst.children[0]?.body[0]?.kind === 'method') {
-				const constructorArgs = (lineAst.children[0].body[0].arguments as any[]);
+				} else if (lineAst.children[0]?.body[0]?.kind === 'method') {
+					const constructorArgs = (lineAst.children[0].body[0].arguments as any[]);
 
-				const argumentAst = constructorArgs.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? constructorArgs[0];
-				propertyName = argumentAst.name?.name;
+					const argumentAst = constructorArgs.find((propertyAst) => propertyAst.name?.name === selectedWord) ?? constructorArgs[0];
+					propertyName = argumentAst.name?.name;
+				}
 			}
 
 			if (!propertyName) {

@@ -58,6 +58,9 @@ suite('Remove Property', function () {
     test('Should remove a property when the cursor is placed in its assignment', () => __awaiter(this, void 0, void 0, function* () {
         yield runFixture('ConstructorWithMultiplePropertiesCursorInAssignment.php', new vscode.Position(15, 18));
     }));
+    test('Should remove a property when the cursor is placed in its constructor docblock', () => __awaiter(this, void 0, void 0, function* () {
+        yield runFixture('ConstructorWithMultiplePropertiesCursorInConstructorDocblock.php', new vscode.Position(16, 24));
+    }));
 });
 function runFixture(fileName, cursorPosition) {
     return __awaiter(this, void 0, void 0, function* () {
