@@ -15,7 +15,7 @@ const assert = require("assert");
 const fs = require("fs");
 const utils_1 = require("./utils");
 const testFolderRelativeLocation = '/../fixtures/breakConstructorIntoMultiline/';
-suite('Customizations', function () {
+suite('Break Constructor Into Multilines', function () {
     setup(() => __awaiter(this, void 0, void 0, function* () {
         yield utils_1.resetDefaultSettings();
     }));

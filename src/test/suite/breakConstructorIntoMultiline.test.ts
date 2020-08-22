@@ -6,7 +6,7 @@ import { waitToAssertInSeconds, delay, resetDefaultSettings } from './utils';
 
 const testFolderRelativeLocation = '/../fixtures/breakConstructorIntoMultiline/';
 
-suite('Customizations', function () {
+suite('Break Constructor Into Multilines', function () {
     setup(async () => {
         await resetDefaultSettings();
     });
