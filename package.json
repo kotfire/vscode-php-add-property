@@ -28,6 +28,7 @@
 		"onCommand:phpAddProperty.add",
 		"onCommand:phpAddProperty.append",
 		"onCommand:phpAddProperty.rename",
+		"onCommand:phpAddProperty.changeType",
 		"onCommand:phpAddProperty.remove",
 		"onCommand:phpAddProperty.breakConstructorIntoMultiline"
 	],
@@ -45,6 +46,10 @@
 			{
 				"command": "phpAddProperty.rename",
 				"title": "Rename PHP Property"
+			},
+			{
+				"command": "phpAddProperty.changeType",
+				"title": "Change PHP Property type"
 			},
 			{
 				"command": "phpAddProperty.remove",
@@ -67,6 +72,10 @@
 				},
 				{
 					"command": "phpAddProperty.rename",
+					"when": "editorLangId == php"
+				},
+				{
+					"command": "phpAddProperty.changeType",
 					"when": "editorLangId == php"
 				},
 				{
@@ -98,16 +107,22 @@
 					"group": "0_phpAddProperty@3"
 				},
 				{
+					"when": "resourceLangId == php && config.phpAddProperty.contextMenuOptions.enable && config.phpAddProperty.contextMenuOptions.changePropertyType",
+					"command": "phpAddProperty.changeType",
+					"alt": "phpAddProperty.changeType",
+					"group": "0_phpAddProperty@4"
+				},
+				{
 					"when": "resourceLangId == php && config.phpAddProperty.contextMenuOptions.enable && config.phpAddProperty.contextMenuOptions.removeProperty",
 					"command": "phpAddProperty.remove",
 					"alt": "phpAddProperty.remove",
-					"group": "0_phpAddProperty@4"
+					"group": "0_phpAddProperty@5"
 				},
 				{
 					"when": "resourceLangId == php && config.phpAddProperty.contextMenuOptions.enable && config.phpAddProperty.contextMenuOptions.breakConstructorIntoMultiline",
 					"command": "phpAddProperty.breakConstructorIntoMultiline",
 					"alt": "phpAddProperty.breakConstructorIntoMultiline",
-					"group": "0_phpAddProperty@5"
+					"group": "0_phpAddProperty@6"
 				}
 			]
 		},
@@ -229,6 +244,11 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Specifies whether to show the rename property command in the context menu options"
+				},
+				"phpAddProperty.contextMenuOptions.changePropertyType": {
+					"type": "boolean",
+					"default": true,
+					"description": "Specifies whether to show the change property type command in the context menu options"
 				},
 				"phpAddProperty.contextMenuOptions.removeProperty": {
 					"type": "boolean",
