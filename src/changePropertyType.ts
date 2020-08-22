@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import Property from './property';
 import Class from './class';
-import { config } from './utils';
+import { config, escapeForRegExp } from './utils';
 
 export function changePropertyType(editor: vscode.TextEditor, property: Property, newPropertyType: string, phpClass: Class) {
 	const document = editor.document;
@@ -17,13 +17,12 @@ export function changePropertyType(editor: vscode.TextEditor, property: Property
 		const node = astClassBody[i];
 
 		if (node.kind === 'propertystatement') {
-            let propertyFound = false;
+            let newPropertyStatementText;
 
 			for (let j = 0; j < node.properties.length; j++) {
                 const propertyNode = node.properties[j];
                 
                 if (propertyNode.name?.name == property.getName()) {
-                    propertyFound = true;
                     const propertyStatementRange = new vscode.Range(
                         new vscode.Position(node.loc.start.line - 1, 0),
                         new vscode.Position(node.loc.end.line, 0)
@@ -37,7 +36,7 @@ export function changePropertyType(editor: vscode.TextEditor, property: Property
                         newPropertyText = `${newPropertyType} ${newPropertyText}`;
                     }
 	
-                    const newPropertyStatementText = propertyStatementText.replace(
+                    newPropertyStatementText = propertyStatementText.replace(
                         propertyNode.loc.source,
                         newPropertyText
                     );
@@ -46,7 +45,7 @@ export function changePropertyType(editor: vscode.TextEditor, property: Property
                 }
             }
             
-            if (propertyFound) {
+            if (newPropertyStatementText) {
                 for (let i = 0; i < node.leadingComments?.length; i++) {
                     const commentNode = node.leadingComments[i];
         
@@ -62,7 +61,13 @@ export function changePropertyType(editor: vscode.TextEditor, property: Property
                     if (typeMatch) {
                         const newCommentText = commentText.replace(typeMatch[1], newPropertyType);
 
-                        newDocumentText = newDocumentText.replace(commentText, newCommentText);
+                        const regexp = new RegExp(
+                            `${escapeForRegExp(commentText)}((?:\s|[\r\n])*)${escapeForRegExp(newPropertyStatementText)}`
+                        );
+                        newDocumentText = newDocumentText.replace(
+                            regexp,
+                            `${newCommentText}$1${newPropertyStatementText}`
+                        );
                     }
                 }
 

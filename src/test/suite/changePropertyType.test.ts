@@ -31,6 +31,10 @@ suite('Change Property Type', function () {
     test('Should change property statement docblock type', async () => {
         await runFixture('PropertyStatementDocblock.php');
     });
+
+    test('Should NOT change other properties statement docblock type', async () => {
+        await runFixture('OtherPropertiesStatementDocblock.php');
+    });
 });
 
 async function runFixture(fileName: string, cursorPosition?: vscode.Position) {

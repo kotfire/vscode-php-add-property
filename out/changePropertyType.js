@@ -11,22 +11,21 @@ function changePropertyType(editor, property, newPropertyType, phpClass) {
     for (let i = 0; i < astClassBody.length; i++) {
         const node = astClassBody[i];
         if (node.kind === 'propertystatement') {
-            let propertyFound = false;
+            let newPropertyStatementText;
             for (let j = 0; j < node.properties.length; j++) {
                 const propertyNode = node.properties[j];
                 if (((_a = propertyNode.name) === null || _a === void 0 ? void 0 : _a.name) == property.getName()) {
-                    propertyFound = true;
                     const propertyStatementRange = new vscode.Range(new vscode.Position(node.loc.start.line - 1, 0), new vscode.Position(node.loc.end.line, 0));
                     const propertyStatementText = document.getText(propertyStatementRange);
                     let newPropertyText = `\$${property.getName()}`;
                     if (utils_1.config('phpAddProperty.property.types') === true || propertyNode.type) {
                         newPropertyText = `${newPropertyType} ${newPropertyText}`;
                     }
-                    const newPropertyStatementText = propertyStatementText.replace(propertyNode.loc.source, newPropertyText);
+                    newPropertyStatementText = propertyStatementText.replace(propertyNode.loc.source, newPropertyText);
                     newDocumentText = newDocumentText.replace(propertyStatementText, newPropertyStatementText);
                 }
             }
-            if (propertyFound) {
+            if (newPropertyStatementText) {
                 for (let i = 0; i < ((_b = node.leadingComments) === null || _b === void 0 ? void 0 : _b.length); i++) {
                     const commentNode = node.leadingComments[i];
                     const commentRange = new vscode.Range(new vscode.Position(commentNode.loc.start.line - 1, 0), new vscode.Position(commentNode.loc.end.line, 0));
@@ -34,7 +33,8 @@ function changePropertyType(editor, property, newPropertyType, phpClass) {
                     const typeMatch = /@var\s(\S*)/g.exec(commentText);
                     if (typeMatch) {
                         const newCommentText = commentText.replace(typeMatch[1], newPropertyType);
-                        newDocumentText = newDocumentText.replace(commentText, newCommentText);
+                        const regexp = new RegExp(`${utils_1.escapeForRegExp(commentText)}((?:\s|[\r\n])*)${utils_1.escapeForRegExp(newPropertyStatementText)}`);
+                        newDocumentText = newDocumentText.replace(regexp, `${newCommentText}$1${newPropertyStatementText}`);
                     }
                 }
                 break;
