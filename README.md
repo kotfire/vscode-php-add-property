@@ -1,10 +1,16 @@
-[![Version](https://vsmarketplacebadge.apphb.com/version-short/kotfire.php-add-property.svg)](https://marketplace.visualstudio.com/items?itemName=kotfire.php-add-property)
-[![Rating](https://vsmarketplacebadge.apphb.com/rating-short/kotfire.php-add-property.svg)](https://marketplace.visualstudio.com/items?itemName=kotfire.php-add-property)
-[![Installs](https://vsmarketplacebadge.apphb.com/installs/kotfire.php-add-property.svg)](https://marketplace.visualstudio.com/items?itemName=kotfire.php-add-property)
+[![Version](https://vsmarketplacebadge.apphb.com/version-short/kotfire.php-add-property.svg?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=kotfire.php-add-property)
+[![Rating](https://vsmarketplacebadge.apphb.com/rating-short/kotfire.php-add-property.svg?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=kotfire.php-add-property)
+[![Installs](https://vsmarketplacebadge.apphb.com/installs/kotfire.php-add-property.svg?style=for-the-badge)](https://marketplace.visualstudio.com/items?itemName=kotfire.php-add-property)
 
 # PHP Add Property
 
 Visual Code Studio extension to manage PHP class properties
+
+## Support my work
+
+[![Github sponsors](https://img.shields.io/badge/Sponsor%20now-181717?style=for-the-badge&logo=github)](https://github.com/sponsors/kotfire)
+[![Buy me a tea](https://img.shields.io/badge/Buy%20me%20a%20tea-555555?style=for-the-badge&logo=Ko-fi)](https://ko-fi.com/M4M71TVH1)
+[![Buy the world a tree](https://img.shields.io/badge/Buy%20the%20world%20a%20tree-%F0%9F%8C%B3-242424?labelColor=276749&style=for-the-badge)](https://plant.treeware.earth/kotfire/vscode-php-add-property)
 
 ## Features
 
@@ -17,6 +23,18 @@ Visual Code Studio extension to manage PHP class properties
 > It gets the property type from the docblock!
 
 ![Add existing properties demo](images/existing.gif)
+
+### Remove a property
+
+![Remove a property demo](images/remove.gif)
+
+### Rename a property
+
+![Remove a property demo](images/rename.gif)
+
+### Change property type
+
+![Remove a property demo](images/type.gif)
 
 ### Insert constructor
 
@@ -56,5 +74,7 @@ This extension contributes the following settings:
 * `phpAddProperty.contextMenuOptions.enable`: Specifies whether to show the context menu options
 * `phpAddProperty.contextMenuOptions.addProperty`: Specifies whether to show the add property command in the context menu options
 * `phpAddProperty.contextMenuOptions.appendProperty`: Specifies whether to show the append property command in the context menu options
+* `phpAddProperty.contextMenuOptions.renameProperty`: Specifies whether to show the rename property command in the context menu options
+* `phpAddProperty.contextMenuOptions.changePropertyType`: Specifies whether to show the change property type command in the context menu options
 * `phpAddProperty.contextMenuOptions.removeProperty`: Specifies whether to show the remove property command in the context menu options
 * `phpAddProperty.contextMenuOptions.breakConstructorIntoMultiline`: Specifies whether to show the break constructor into multiline command in the context menu options
