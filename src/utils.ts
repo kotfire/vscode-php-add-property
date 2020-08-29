@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import PhpEngine from 'php-parser';
+import { debugEnvName } from './constants';
 
 export function getVisibilityChoice(defaultValue: string): string {
     let visibilityChoices = ['public', 'protected', 'private'];
@@ -182,4 +183,8 @@ export function replaceWithSnippet(snippet: string, range: vscode.Range) {
             );
         }
     });
+}
+
+export function isDebugMode() {
+    return process.env[debugEnvName] === "true";
 }

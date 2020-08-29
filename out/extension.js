@@ -26,7 +26,7 @@ function activate(context) {
         const previousVersion = context.globalState.get(constants_1.GlobalState.version);
         const versionAsInt = parseInt(version.replace(/\./g, ''));
         const previousVersionAsInt = previousVersion ? parseInt(previousVersion.replace(/\./g, '')) : 0;
-        if (previousVersionAsInt < versionAsInt) {
+        if (utils_1.isDebugMode() || previousVersionAsInt < versionAsInt) {
             try {
                 const extensionRoot = context.asAbsolutePath(`webviews/${version}`);
                 const filename = `${extensionRoot}/index.html`;
@@ -41,7 +41,11 @@ function activate(context) {
                 panel.iconPath = vscode.Uri.file(context.asAbsolutePath('images/icon.png'));
                 panel.webview.html = html;
             }
-            catch (error) { }
+            catch (error) {
+                if (utils_1.isDebugMode()) {
+                    console.error(error);
+                }
+            }
         }
         context.globalState.update(constants_1.GlobalState.version, version);
         context.subscriptions.push(vscode.commands.registerCommand('phpAddProperty.add', () => __awaiter(this, void 0, void 0, function* () {

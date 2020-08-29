@@ -4,7 +4,7 @@ import Locator from './locator';
 import Property from './property';
 import insertProperty from './insertProperty';
 import { removeProperty } from './removeProperty';
-import { forceBreakConstructorIntoMultiline, getPropertyNameFromLineText } from './utils';
+import { forceBreakConstructorIntoMultiline, getPropertyNameFromLineText, isDebugMode } from './utils';
 import { renameProperty } from './renameProperty';
 import { changePropertyType } from './changePropertyType';
 import { extensionQualifiedId, GlobalState } from './constants';
@@ -17,7 +17,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	const versionAsInt = parseInt((version as string).replace(/\./g, ''));
 	const previousVersionAsInt = previousVersion ? parseInt((previousVersion as string).replace(/\./g, '')) : 0;
 
-	if (previousVersionAsInt < versionAsInt) {
+	if (isDebugMode() || previousVersionAsInt < versionAsInt) {
 		try {
 			const extensionRoot = context.asAbsolutePath(`webviews/${version}`);
 			const filename = `${extensionRoot}/index.html`;
@@ -42,7 +42,11 @@ export async function activate(context: vscode.ExtensionContext) {
 
 			panel.iconPath = vscode.Uri.file(context.asAbsolutePath('images/icon.png'));
 			panel.webview.html = html;
-		} catch (error) {}
+		} catch (error) {
+			if (isDebugMode()) {
+				console.error(error);
+			}
+		}
 	}	
 
 	context.globalState.update(GlobalState.version, version);

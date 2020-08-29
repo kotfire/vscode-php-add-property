@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const vscode = require("vscode");
+const constants_1 = require("./constants");
 function getVisibilityChoice(defaultValue) {
     let visibilityChoices = ['public', 'protected', 'private'];
     if (visibilityChoices.indexOf(defaultValue) !== -1) {
@@ -146,4 +147,8 @@ function replaceWithSnippet(snippet, range) {
     });
 }
 exports.replaceWithSnippet = replaceWithSnippet;
+function isDebugMode() {
+    return process.env[constants_1.debugEnvName] === "true";
+}
+exports.isDebugMode = isDebugMode;
 //# sourceMappingURL=utils.js.map
