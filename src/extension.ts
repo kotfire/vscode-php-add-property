@@ -7,8 +7,46 @@ import { removeProperty } from './removeProperty';
 import { forceBreakConstructorIntoMultiline, getPropertyNameFromLineText } from './utils';
 import { renameProperty } from './renameProperty';
 import { changePropertyType } from './changePropertyType';
+import { extensionQualifiedId, GlobalState } from './constants';
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
+	const extension = vscode.extensions.getExtension(extensionQualifiedId)!;
+	const version = extension.packageJSON.version;
+	const previousVersion = context.globalState.get<string>(GlobalState.version);
+
+	const versionAsInt = parseInt((version as string).replace(/\./g, ''));
+	const previousVersionAsInt = previousVersion ? parseInt((previousVersion as string).replace(/\./g, '')) : 0;
+
+	if (previousVersionAsInt < versionAsInt) {
+		try {
+			const extensionRoot = context.asAbsolutePath(`webviews/${version}`);
+			const filename = `${extensionRoot}/index.html`;
+			const doc = await vscode.workspace.openTextDocument(filename);
+			const content = doc.getText();
+
+			const html = content.replace(
+				/#{root}/g,
+				vscode.Uri.file(extensionRoot)
+					.with({ scheme: 'vscode-resource' })
+					.toString()
+			);
+
+			const panel = vscode.window.createWebviewPanel(
+				`phpAddPropertyWebView-${version}`,
+				`PHP Add Property: What's new in v${version}`,
+				vscode.ViewColumn.One,
+				{
+					localResourceRoots: [vscode.Uri.file(context.extensionPath)],
+				}
+			);
+
+			panel.iconPath = vscode.Uri.file(context.asAbsolutePath('images/icon.png'));
+			panel.webview.html = html;
+		} catch (error) {}
+	}	
+
+	context.globalState.update(GlobalState.version, version);
+
 	context.subscriptions.push(
 		vscode.commands.registerCommand('phpAddProperty.add', async () => {
 			if (vscode.window.activeTextEditor === undefined) {

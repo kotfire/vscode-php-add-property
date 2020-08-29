@@ -4,7 +4,7 @@
 	"description": "Manage PHP class properties",
 	"publisher": "kotfire",
 	"license": "SEE LICENSE IN LICENSE",
-	"version": "0.5.0",
+	"version": "1.0.0",
 	"engines": {
 		"vscode": "^1.31.0"
 	},
@@ -24,13 +24,7 @@
 	],
 	"icon": "images/icon.png",
 	"activationEvents": [
-		"onLanguage:php",
-		"onCommand:phpAddProperty.add",
-		"onCommand:phpAddProperty.append",
-		"onCommand:phpAddProperty.rename",
-		"onCommand:phpAddProperty.changeType",
-		"onCommand:phpAddProperty.remove",
-		"onCommand:phpAddProperty.breakConstructorIntoMultiline"
+		"*"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
