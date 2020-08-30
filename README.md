@@ -78,3 +78,4 @@ This extension contributes the following settings:
 * `phpAddProperty.contextMenuOptions.changePropertyType`: Specifies whether to show the change property type command in the context menu options
 * `phpAddProperty.contextMenuOptions.removeProperty`: Specifies whether to show the remove property command in the context menu options
 * `phpAddProperty.contextMenuOptions.breakConstructorIntoMultiline`: Specifies whether to show the break constructor into multiline command in the context menu options
+* `phpAddProperty.showVersionUpdates`: Specifies whether to show What's New after upgrading to a new version

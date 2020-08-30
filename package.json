@@ -253,6 +253,11 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Specifies whether to show the break constructor into multiline command in the context menu options"
+				},
+				"phpAddProperty.showVersionUpdates": {
+					"type": "boolean",
+					"default": true,
+					"description": "Specifies whether to show What's New after upgrading to a new version"
 				}
 			}
 		}

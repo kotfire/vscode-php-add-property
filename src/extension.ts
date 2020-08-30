@@ -4,7 +4,7 @@ import Locator from './locator';
 import Property from './property';
 import insertProperty from './insertProperty';
 import { removeProperty } from './removeProperty';
-import { forceBreakConstructorIntoMultiline, getPropertyNameFromLineText, isDebugMode } from './utils';
+import { forceBreakConstructorIntoMultiline, getPropertyNameFromLineText, isDebugMode, config } from './utils';
 import { renameProperty } from './renameProperty';
 import { changePropertyType } from './changePropertyType';
 import { extensionQualifiedId, GlobalState } from './constants';
@@ -17,7 +17,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	const versionAsInt = parseInt((version as string).replace(/\./g, ''));
 	const previousVersionAsInt = previousVersion ? parseInt((previousVersion as string).replace(/\./g, '')) : 0;
 
-	if (isDebugMode() || previousVersionAsInt < versionAsInt) {
+	const showUpdatesEnabled = config('phpAddProperty.showVersionUpdates') === true;
+
+	if (isDebugMode() || (showUpdatesEnabled && previousVersionAsInt < versionAsInt)) {
 		try {
 			const extensionRoot = context.asAbsolutePath(`webviews/${version}`);
 			const filename = `${extensionRoot}/index.html`;

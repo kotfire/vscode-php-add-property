@@ -26,7 +26,8 @@ function activate(context) {
         const previousVersion = context.globalState.get(constants_1.GlobalState.version);
         const versionAsInt = parseInt(version.replace(/\./g, ''));
         const previousVersionAsInt = previousVersion ? parseInt(previousVersion.replace(/\./g, '')) : 0;
-        if (utils_1.isDebugMode() || previousVersionAsInt < versionAsInt) {
+        const showUpdatesEnabled = utils_1.config('phpAddProperty.showVersionUpdates') === true;
+        if (utils_1.isDebugMode() || (showUpdatesEnabled && previousVersionAsInt < versionAsInt)) {
             try {
                 const extensionRoot = context.asAbsolutePath(`webviews/${version}`);
                 const filename = `${extensionRoot}/index.html`;
