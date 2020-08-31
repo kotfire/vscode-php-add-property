@@ -4,7 +4,7 @@
 	"description": "Manage PHP class properties",
 	"publisher": "kotfire",
 	"license": "SEE LICENSE IN LICENSE",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"engines": {
 		"vscode": "^1.31.0"
 	},
@@ -270,6 +270,9 @@
 		"pretest": "npm run compile",
 		"test": "node ./out/test/runTest.js"
 	},
+	"dependencies": {
+		"php-parser": "^3.0.1"
+	},
 	"devDependencies": {
 		"@types/glob": "^7.1.1",
 		"@types/mocha": "^7.0.2",
@@ -280,7 +283,6 @@
 		"eslint": "^6.8.0",
 		"glob": "^7.1.6",
 		"mocha": "^7.1.2",
-		"php-parser": "^3.0.1",
 		"typescript": "^3.8.3",
 		"vscode-test": "^1.3.0"
 	},
