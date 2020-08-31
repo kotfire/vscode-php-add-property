@@ -1,3 +1,18 @@
+## 1.0.0 (2020-08-31)
+
+### Added
+- Rewrite to use a PHP parser to reduce usage of RegExp
+- Rewrite to use typescript
+- Add a new command to remove properties
+- Add a new command to rename properties
+- Add a new command to change properties type
+- Add a new command to transform a constructor into multiline
+- Allow to configure the context menu commands via settings
+
+### Fixed
+- [#22](https://github.com/kotfire/vscode-php-add-property/issues/22) Add existing properties does not work with typed properties
+- [#23](https://github.com/kotfire/vscode-php-add-property/issues/23) Decrease the minimum vscode version to 1.31.0
+
 ## 0.5.0 (2020-02-07)
 
 ### Added
