@@ -1,3 +1,11 @@
+## 1.1.0 (2020-09-05)
+
+### Added
+- [#28](https://github.com/kotfire/vscode-php-add-property/issues/28) Add support for nullable property types
+
+### Fixed
+- [#26](https://github.com/kotfire/vscode-php-add-property/issues/26) Do not add extra space using docblock with param
+
 ## 1.0.0 (2020-08-31)
 
 ### Added

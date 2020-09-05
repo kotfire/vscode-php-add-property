@@ -4,7 +4,7 @@
 	"description": "Manage PHP class properties",
 	"publisher": "kotfire",
 	"license": "SEE LICENSE IN LICENSE",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"engines": {
 		"vscode": "^1.31.0"
 	},
