@@ -20,6 +20,9 @@ function run() {
             try {
                 // Run the mocha test
                 mocha.run(failures => {
+                    if (process.env.VSCODE_VERSION === '1.31.0') {
+                        process.exit(failures > 0 ? 1 : 0);
+                    }
                     if (failures > 0) {
                         e(new Error(`${failures} tests failed.`));
                     }

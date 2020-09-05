@@ -25,7 +25,10 @@ async function main() {
 				launchArgs: [
 					`--user-data-dir=${testUserDir}`,
 					'--disable-extensions'
-				]
+				],
+				extensionTestsEnv: {
+					'VSCODE_VERSION': vscodeMinimumVersion,
+				}
 			}
 		);
 
