@@ -149,9 +149,15 @@ function activate(context) {
                 const typeMatch = /@var\s(\S*)/g.exec(node.value);
                 if (typeMatch) {
                     docblockType = typeMatch[1];
+                    let types = docblockType.split('|').map(type => type.trim());
+                    const nullableTypeIndex = types.indexOf('null');
+                    if (nullableTypeIndex !== -1) {
+                        types.splice(nullableTypeIndex, 1);
+                        docblockType = `?${types.join('|')}`;
+                    }
                 }
             }
-            const property = new property_1.default(propertyName, (_g = (_f = propertyAst.type) === null || _f === void 0 ? void 0 : _f.name) !== null && _g !== void 0 ? _g : docblockType);
+            const property = new property_1.default(propertyName, propertyAst.nullable, (_g = (_f = propertyAst.type) === null || _f === void 0 ? void 0 : _f.name) !== null && _g !== void 0 ? _g : docblockType);
             insertProperty_1.default(vscode.window.activeTextEditor, property, phpClass, line.text);
         })), vscode.commands.registerCommand('phpAddProperty.rename', () => __awaiter(this, void 0, void 0, function* () {
             if (vscode.window.activeTextEditor === undefined) {

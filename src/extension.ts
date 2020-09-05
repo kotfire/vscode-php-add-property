@@ -188,10 +188,19 @@ export async function activate(context: vscode.ExtensionContext) {
 
 				if (typeMatch) {
 					docblockType = typeMatch[1];
+
+					let types = docblockType.split('|').map(type => type.trim());
+					const nullableTypeIndex = types.indexOf('null');
+
+					if (nullableTypeIndex !== -1) {
+						types.splice(nullableTypeIndex, 1);
+
+						docblockType = `?${types.join('|')}`;
+					}
 				}
 			}
 
-			const property = new Property(propertyName, propertyAst.type?.name ?? docblockType);
+			const property = new Property(propertyName, propertyAst.nullable, propertyAst.type?.name ?? docblockType);
 
 			insertProperty(vscode.window.activeTextEditor, property, phpClass, line.text);
 		}),

@@ -46,6 +46,13 @@ suite('Add Existing Property', function () {
         yield vscode.workspace.getConfiguration('phpAddProperty').update('constructor.docblock.withParameter', true, true);
         yield runFixture('DocblockTypeWithParameter.php', new vscode.Position(10, 22));
     }));
+    test('Should add an existing property with a nullable type', () => __awaiter(this, void 0, void 0, function* () {
+        yield vscode.workspace.getConfiguration('phpAddProperty').update('constructor.docblock.enable', true, true);
+        yield runFixture('NullableType.php', new vscode.Position(10, 0));
+    }));
+    test('Should add a nullable property using type from property docblock', () => __awaiter(this, void 0, void 0, function* () {
+        yield runFixture('UseNullableDocblock.php', new vscode.Position(8, 0));
+    }));
 });
 function runFixture(fileName, cursorPosition) {
     return __awaiter(this, void 0, void 0, function* () {

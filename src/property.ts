@@ -2,15 +2,21 @@ import { config, indentText, getVisibilityChoice } from "./utils";
 
 export default class Property {
     private name: string;
+    private nullable: Boolean;
     private type?: string;
 
-    constructor(name: string, type?: string) {
+    constructor(name: string, nullable: Boolean = false, type?: string) {
         this.name = name;
+        this.nullable = nullable;
         this.type = type;
     }
 
     public getName() {
         return this.name;
+    }
+
+    public isNullable() {
+        return this.nullable === true;
     }
 
     public getType() {
@@ -65,7 +71,13 @@ export default class Property {
         let tabStopsText = `$${tabStops.constructorParameterType}`;
 
         if (this.getType()) {
-            tabStopsText = `\${${tabStops.constructorParameterType}:${this.getType()}}`;
+            let typeText = this.getType();
+
+            if (this.isNullable()) {
+                typeText = `?${typeText}`;
+            }
+
+            tabStopsText = `\${${tabStops.constructorParameterType}:${typeText}}`;
         }
 
         if (config('phpAddProperty.property.stopToImport') === true) {
@@ -96,7 +108,13 @@ export default class Property {
         let constructorParamDocblockText = `\${${docblockTypeStop}}`;
 
         if (this.getType()) {
-            constructorParamDocblockText = `\${${docblockTypeStop}:${this.getType()}} `;
+            let typeText = this.getType();
+
+            if (this.isNullable()) {
+                typeText = `${typeText}|null`;
+            }
+
+            constructorParamDocblockText = `\${${docblockTypeStop}:${typeText}} `;
         }
 
         if (config('phpAddProperty.constructor.docblock.stopToImport') === true) {
