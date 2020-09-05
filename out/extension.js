@@ -151,7 +151,7 @@ function activate(context) {
                     docblockType = typeMatch[1];
                 }
             }
-            const property = new property_1.default(propertyName, (_g = (_f = propertyAst.type) === null || _f === void 0 ? void 0 : _f.name) !== null && _g !== void 0 ? _g : docblockType);
+            const property = new property_1.default(propertyName, propertyAst.nullable, (_g = (_f = propertyAst.type) === null || _f === void 0 ? void 0 : _f.name) !== null && _g !== void 0 ? _g : docblockType);
             insertProperty_1.default(vscode.window.activeTextEditor, property, phpClass, line.text);
         })), vscode.commands.registerCommand('phpAddProperty.rename', () => __awaiter(this, void 0, void 0, function* () {
             if (vscode.window.activeTextEditor === undefined) {

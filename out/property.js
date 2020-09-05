@@ -2,12 +2,16 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("./utils");
 class Property {
-    constructor(name, type) {
+    constructor(name, nullable = false, type) {
         this.name = name;
+        this.nullable = nullable;
         this.type = type;
     }
     getName() {
         return this.name;
+    }
+    isNullable() {
+        return this.nullable === true;
     }
     getType() {
         return this.type;
@@ -50,7 +54,11 @@ class Property {
     getParameterText(tabStops) {
         let tabStopsText = `$${tabStops.constructorParameterType}`;
         if (this.getType()) {
-            tabStopsText = `\${${tabStops.constructorParameterType}:${this.getType()}}`;
+            let typeText = this.getType();
+            if (this.isNullable()) {
+                typeText = `?${typeText}`;
+            }
+            tabStopsText = `\${${tabStops.constructorParameterType}:${typeText}}`;
         }
         if (utils_1.config('phpAddProperty.property.stopToImport') === true) {
             tabStopsText += `$${tabStops.constructorParameterStop}`;
@@ -72,7 +80,11 @@ class Property {
         }
         let constructorParamDocblockText = `\${${docblockTypeStop}}`;
         if (this.getType()) {
-            constructorParamDocblockText = `\${${docblockTypeStop}:${this.getType()}} `;
+            let typeText = this.getType();
+            if (this.isNullable()) {
+                typeText = `${typeText}|null`;
+            }
+            constructorParamDocblockText = `\${${docblockTypeStop}:${typeText}} `;
         }
         if (utils_1.config('phpAddProperty.constructor.docblock.stopToImport') === true) {
             constructorParamDocblockText += `\$${dockblockImportStop}`;

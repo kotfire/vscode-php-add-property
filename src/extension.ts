@@ -191,7 +191,7 @@ export async function activate(context: vscode.ExtensionContext) {
 				}
 			}
 
-			const property = new Property(propertyName, propertyAst.type?.name ?? docblockType);
+			const property = new Property(propertyName, propertyAst.nullable, propertyAst.type?.name ?? docblockType);
 
 			insertProperty(vscode.window.activeTextEditor, property, phpClass, line.text);
 		}),
