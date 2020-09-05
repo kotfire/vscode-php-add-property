@@ -72,7 +72,7 @@ class Property {
         }
         let constructorParamDocblockText = `\${${docblockTypeStop}}`;
         if (this.getType()) {
-            constructorParamDocblockText = `\${${docblockTypeStop}:${this.getType()} }`;
+            constructorParamDocblockText = `\${${docblockTypeStop}:${this.getType()}} `;
         }
         if (utils_1.config('phpAddProperty.constructor.docblock.stopToImport') === true) {
             constructorParamDocblockText += `\$${dockblockImportStop}`;

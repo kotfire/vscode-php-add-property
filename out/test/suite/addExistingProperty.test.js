@@ -41,6 +41,11 @@ suite('Add Existing Property', function () {
         yield vscode.workspace.getConfiguration('phpAddProperty').update('constructor.docblock.enable', true, true);
         yield runFixture('ConstructorDocblockUsingDocblock.php', new vscode.Position(8, 0));
     }));
+    test('Should NOT add an extra space when adding property type and docblock type at the same type', () => __awaiter(this, void 0, void 0, function* () {
+        yield vscode.workspace.getConfiguration('phpAddProperty').update('constructor.docblock.enable', true, true);
+        yield vscode.workspace.getConfiguration('phpAddProperty').update('constructor.docblock.withParameter', true, true);
+        yield runFixture('DocblockTypeWithParameter.php', new vscode.Position(10, 22));
+    }));
 });
 function runFixture(fileName, cursorPosition) {
     return __awaiter(this, void 0, void 0, function* () {
